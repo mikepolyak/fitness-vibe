@@ -9,125 +9,180 @@ namespace FitnessVibe.Domain.ValueObjects
     /// </summary>
     public class UserPreferences
     {
-        public string TimeZone { get; private set; }
-        public bool AllowNotifications { get; private set; }
-        public bool ShareActivitiesPublicly { get; private set; }
-        public bool ReceiveMotivationalMessages { get; private set; }
-        public bool AllowFriendRequests { get; private set; }
-        public int QuietHourStart { get; private set; } // 24-hour format
-        public int QuietHourEnd { get; private set; }   // 24-hour format
-        public string PreferredUnits { get; private set; } // "metric" or "imperial"
-        public bool EnableAudioCues { get; private set; }
-        public bool ShareToSocialMedia { get; private set; }
+        /// <summary>
+        /// The user's preferred time zone (e.g., "UTC", "America/New_York")
+        /// </summary>
+        public required string TimeZone { get; init; } = "UTC";
 
-        private UserPreferences() { } // For EF Core
+        /// <summary>
+        /// Whether the user wants to receive app notifications
+        /// </summary>
+        public required bool AllowNotifications { get; init; } = true;
 
-        public UserPreferences(
-            string timeZone = "UTC",
-            bool allowNotifications = true,
-            bool shareActivitiesPublicly = false,
-            bool receiveMotivationalMessages = true,
-            bool allowFriendRequests = true,
-            int quietHourStart = 22,
-            int quietHourEnd = 7,
-            string preferredUnits = "metric",
-            bool enableAudioCues = true,
-            bool shareToSocialMedia = false)
+        /// <summary>
+        /// Whether the user's activities are visible to the public
+        /// </summary>
+        public required bool ShareActivitiesPublicly { get; init; } = false;
+
+        /// <summary>
+        /// Whether the user wants to receive motivational messages
+        /// </summary>
+        public required bool ReceiveMotivationalMessages { get; init; } = true;
+
+        /// <summary>
+        /// Whether other users can send friend requests
+        /// </summary>
+        public required bool AllowFriendRequests { get; init; } = true;
+
+        /// <summary>
+        /// When quiet hours begin (24-hour format, 0-23)
+        /// </summary>
+        public required int QuietHourStart { get; init; } = 22;
+
+        /// <summary>
+        /// When quiet hours end (24-hour format, 0-23)
+        /// </summary>
+        public required int QuietHourEnd { get; init; } = 7;
+
+        /// <summary>
+        /// Preferred measurement system ("metric" or "imperial")
+        /// </summary>
+        public required string PreferredUnits { get; init; } = "metric";
+
+        /// <summary>
+        /// Whether to play audio cues during activities
+        /// </summary>
+        public required bool EnableAudioCues { get; init; } = true;
+
+        /// <summary>
+        /// Whether to share achievements to social media
+        /// </summary>
+        public required bool ShareToSocialMedia { get; init; } = false;
+
+        /// <summary>
+        /// Creates a new UserPreferences instance with default values
+        /// </summary>
+        public static UserPreferences Default() => new()
         {
-            TimeZone = timeZone ?? throw new ArgumentNullException(nameof(timeZone));
-            AllowNotifications = allowNotifications;
-            ShareActivitiesPublicly = shareActivitiesPublicly;
-            ReceiveMotivationalMessages = receiveMotivationalMessages;
-            AllowFriendRequests = allowFriendRequests;
-            QuietHourStart = ValidateHour(quietHourStart, nameof(quietHourStart));
-            QuietHourEnd = ValidateHour(quietHourEnd, nameof(quietHourEnd));
-            PreferredUnits = preferredUnits ?? throw new ArgumentNullException(nameof(preferredUnits));
-            EnableAudioCues = enableAudioCues;
-            ShareToSocialMedia = shareToSocialMedia;
-        }
+            TimeZone = "UTC",
+            AllowNotifications = true,
+            ShareActivitiesPublicly = false,
+            ReceiveMotivationalMessages = true,
+            AllowFriendRequests = true,
+            QuietHourStart = 22,
+            QuietHourEnd = 7,
+            PreferredUnits = "metric",
+            EnableAudioCues = true,
+            ShareToSocialMedia = false
+        };
 
-        public static UserPreferences Default() => new UserPreferences();
-
-        public UserPreferences UpdateNotificationSettings(
-            bool allowNotifications,
-            bool receiveMotivationalMessages,
-            int quietHourStart,
-            int quietHourEnd)
+        /// <summary>
+        /// Creates a new UserPreferences instance with the specified values
+        /// </summary>
+        public static UserPreferences Create(
+            string? timeZone = null,
+            bool? allowNotifications = null,
+            bool? shareActivitiesPublicly = null,
+            bool? receiveMotivationalMessages = null,
+            bool? allowFriendRequests = null,
+            int? quietHourStart = null,
+            int? quietHourEnd = null,
+            string? preferredUnits = null,
+            bool? enableAudioCues = null,
+            bool? shareToSocialMedia = null)
         {
-            return new UserPreferences(
-                TimeZone,
-                allowNotifications,
-                ShareActivitiesPublicly,
-                receiveMotivationalMessages,
-                AllowFriendRequests,
-                quietHourStart,
-                quietHourEnd,
-                PreferredUnits,
-                EnableAudioCues,
-                ShareToSocialMedia);
-        }
+            var tz = timeZone ?? "UTC";
+            var units = preferredUnits ?? "metric";
+            var startHour = quietHourStart ?? 22;
+            var endHour = quietHourEnd ?? 7;
 
-        public UserPreferences UpdatePrivacySettings(
-            bool shareActivitiesPublicly,
-            bool allowFriendRequests,
-            bool shareToSocialMedia)
-        {
-            return new UserPreferences(
-                TimeZone,
-                AllowNotifications,
-                shareActivitiesPublicly,
-                ReceiveMotivationalMessages,
-                allowFriendRequests,
-                QuietHourStart,
-                QuietHourEnd,
-                PreferredUnits,
-                EnableAudioCues,
-                shareToSocialMedia);
-        }
+            ValidateHour(startHour, nameof(quietHourStart));
+            ValidateHour(endHour, nameof(quietHourEnd));
+            ValidateUnits(units);
 
-        public UserPreferences UpdateDisplaySettings(
-            string timeZone,
-            string preferredUnits,
-            bool enableAudioCues)
-        {
-            return new UserPreferences(
-                timeZone,
-                AllowNotifications,
-                ShareActivitiesPublicly,
-                ReceiveMotivationalMessages,
-                AllowFriendRequests,
-                QuietHourStart,
-                QuietHourEnd,
-                preferredUnits,
-                enableAudioCues,
-                ShareToSocialMedia);
-        }
-
-        public bool IsInQuietHours(DateTime dateTime)
-        {
-            var hour = dateTime.Hour;
-            
-            // Handle quiet hours that span midnight (e.g., 22:00 to 07:00)
-            if (QuietHourStart > QuietHourEnd)
+            return new()
             {
-                return hour >= QuietHourStart || hour < QuietHourEnd;
-            }
-            
-            return hour >= QuietHourStart && hour < QuietHourEnd;
+                TimeZone = tz,
+                AllowNotifications = allowNotifications ?? true,
+                ShareActivitiesPublicly = shareActivitiesPublicly ?? false,
+                ReceiveMotivationalMessages = receiveMotivationalMessages ?? true,
+                AllowFriendRequests = allowFriendRequests ?? true,
+                QuietHourStart = startHour,
+                QuietHourEnd = endHour,
+                PreferredUnits = units,
+                EnableAudioCues = enableAudioCues ?? true,
+                ShareToSocialMedia = shareToSocialMedia ?? false
+            };
+        }
+
+        /// <summary>
+        /// Creates a new UserPreferences instance with some values updated
+        /// </summary>
+        public UserPreferences With(
+            string? timeZone = null,
+            bool? allowNotifications = null,
+            bool? shareActivitiesPublicly = null,
+            bool? receiveMotivationalMessages = null,
+            bool? allowFriendRequests = null,
+            int? quietHourStart = null,
+            int? quietHourEnd = null,
+            string? preferredUnits = null,
+            bool? enableAudioCues = null,
+            bool? shareToSocialMedia = null)
+        {
+            if (quietHourStart.HasValue)
+                ValidateHour(quietHourStart.Value, nameof(quietHourStart));
+            if (quietHourEnd.HasValue)
+                ValidateHour(quietHourEnd.Value, nameof(quietHourEnd));
+            if (preferredUnits != null)
+                ValidateUnits(preferredUnits);
+
+            return new()
+            {
+                TimeZone = timeZone ?? this.TimeZone,
+                AllowNotifications = allowNotifications ?? this.AllowNotifications,
+                ShareActivitiesPublicly = shareActivitiesPublicly ?? this.ShareActivitiesPublicly,
+                ReceiveMotivationalMessages = receiveMotivationalMessages ?? this.ReceiveMotivationalMessages,
+                AllowFriendRequests = allowFriendRequests ?? this.AllowFriendRequests,
+                QuietHourStart = quietHourStart ?? this.QuietHourStart,
+                QuietHourEnd = quietHourEnd ?? this.QuietHourEnd,
+                PreferredUnits = preferredUnits ?? this.PreferredUnits,
+                EnableAudioCues = enableAudioCues ?? this.EnableAudioCues,
+                ShareToSocialMedia = shareToSocialMedia ?? this.ShareToSocialMedia
+            };
         }
 
         private static int ValidateHour(int hour, string paramName)
         {
             if (hour < 0 || hour > 23)
-                throw new ArgumentException("Hour must be between 0 and 23", paramName);
+                throw new ArgumentOutOfRangeException(paramName, hour, "Hour must be between 0 and 23");
             return hour;
         }
 
-        // Override Equals and GetHashCode for value semantics
+        private static string ValidateUnits(string units)
+        {
+            if (string.IsNullOrWhiteSpace(units))
+                throw new ArgumentException("Units cannot be empty", nameof(units));
+
+            return units.ToLower() switch
+            {
+                "metric" or "imperial" => units.ToLower(),
+                _ => throw new ArgumentException("Units must be either 'metric' or 'imperial'", nameof(units))
+            };
+        }
+
+        /// <summary>
+        /// Checks if another UserPreferences object has the same values as this one
+        /// </summary>
+        /// <param name="obj">The object to compare with</param>
+        /// <returns>True if the objects have the same values, false otherwise</returns>
         public override bool Equals(object? obj)
         {
-            return obj is UserPreferences other &&
-                   TimeZone == other.TimeZone &&
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            var other = (UserPreferences)obj;
+            return TimeZone == other.TimeZone &&
                    AllowNotifications == other.AllowNotifications &&
                    ShareActivitiesPublicly == other.ShareActivitiesPublicly &&
                    ReceiveMotivationalMessages == other.ReceiveMotivationalMessages &&
@@ -139,19 +194,24 @@ namespace FitnessVibe.Domain.ValueObjects
                    ShareToSocialMedia == other.ShareToSocialMedia;
         }
 
+        /// <summary>
+        /// Generates a hash code based on all the preference values
+        /// </summary>
+        /// <returns>A hash code that can be used for comparisons and collections</returns>
         public override int GetHashCode()
         {
-            return HashCode.Combine(
-                TimeZone,
-                AllowNotifications,
-                ShareActivitiesPublicly,
-                ReceiveMotivationalMessages,
-                AllowFriendRequests,
-                QuietHourStart,
-                QuietHourEnd,
-                PreferredUnits,
-                EnableAudioCues,
-                ShareToSocialMedia);
+            var hashCode = new HashCode();
+            hashCode.Add(TimeZone);
+            hashCode.Add(AllowNotifications);
+            hashCode.Add(ShareActivitiesPublicly);
+            hashCode.Add(ReceiveMotivationalMessages);
+            hashCode.Add(AllowFriendRequests);
+            hashCode.Add(QuietHourStart);
+            hashCode.Add(QuietHourEnd);
+            hashCode.Add(PreferredUnits);
+            hashCode.Add(EnableAudioCues);
+            hashCode.Add(ShareToSocialMedia);
+            return hashCode.ToHashCode();
         }
     }
 }

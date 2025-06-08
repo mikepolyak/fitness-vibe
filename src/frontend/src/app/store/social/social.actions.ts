@@ -23,7 +23,7 @@ export const loadActivityFeed = createAction(
 
 export const loadActivityFeedSuccess = createAction(
   '[Social] Load Activity Feed Success',
-  props<{ 
+  props<{
     posts: Array<{
       id: number;
       userId: number;
@@ -46,13 +46,7 @@ export const loadActivityFeedSuccess = createAction(
         route?: any;
       };
       goalId?: number;
-      goal?: {
-        id: number;
-        title: string;
-        type: string;
-        progress: number;
-        target: number;
-      };
+      goal?: any;
       postType: 'activity' | 'goal_achievement' | 'milestone' | 'badge_earned' | 'level_up' | 'general';
       content: string;
       images: string[];
@@ -73,12 +67,12 @@ export const loadActivityFeedSuccess = createAction(
 
 export const loadActivityFeedFailure = createAction(
   '[Social] Load Activity Feed Failure',
-  props<{ error: string }>()
+  props<{ error: any }>()
 );
 
 export const createPost = createAction(
   '[Social] Create Post',
-  props<{ 
+  props<{
     postData: {
       content: string;
       postType: 'activity' | 'goal_achievement' | 'milestone' | 'badge_earned' | 'level_up' | 'general';
@@ -99,24 +93,7 @@ export const createPostSuccess = createAction(
 
 export const createPostFailure = createAction(
   '[Social] Create Post Failure',
-  props<{ error: string }>()
-);
-
-export const updatePost = createAction(
-  '[Social] Update Post',
-  props<{ 
-    postId: number;
-    updates: {
-      content?: string;
-      visibility?: 'public' | 'friends' | 'private';
-      tags?: string[];
-    };
-  }>()
-);
-
-export const updatePostSuccess = createAction(
-  '[Social] Update Post Success',
-  props<{ post: any }>()
+  props<{ error: any }>()
 );
 
 export const deletePost = createAction(
@@ -127,6 +104,11 @@ export const deletePost = createAction(
 export const deletePostSuccess = createAction(
   '[Social] Delete Post Success',
   props<{ postId: number }>()
+);
+
+export const deletePostFailure = createAction(
+  '[Social] Delete Post Failure',
+  props<{ error: any }>()
 );
 
 // Post Interactions
@@ -140,6 +122,11 @@ export const likePostSuccess = createAction(
   props<{ postId: number; likesCount: number }>()
 );
 
+export const likePostFailure = createAction(
+  '[Social] Like Post Failure',
+  props<{ error: any }>()
+);
+
 export const unlikePost = createAction(
   '[Social] Unlike Post',
   props<{ postId: number }>()
@@ -148,6 +135,11 @@ export const unlikePost = createAction(
 export const unlikePostSuccess = createAction(
   '[Social] Unlike Post Success',
   props<{ postId: number; likesCount: number }>()
+);
+
+export const unlikePostFailure = createAction(
+  '[Social] Unlike Post Failure',
+  props<{ error: any }>()
 );
 
 export const savePost = createAction(
@@ -193,11 +185,10 @@ export const loadPostComments = createAction(
 
 export const loadPostCommentsSuccess = createAction(
   '[Social] Load Post Comments Success',
-  props<{ 
+  props<{
     postId: number;
     comments: Array<{
       id: number;
-      postId: number;
       userId: number;
       user: {
         id: number;
@@ -208,17 +199,24 @@ export const loadPostCommentsSuccess = createAction(
       content: string;
       likes: number;
       isLiked: boolean;
-      replies: number;
       createdAt: Date;
       updatedAt?: Date;
+      parentCommentId?: number;
+      replies?: number;
     }>;
     hasMore: boolean;
+    totalCount: number;
   }>()
+);
+
+export const loadPostCommentsFailure = createAction(
+  '[Social] Load Post Comments Failure',
+  props<{ error: any }>()
 );
 
 export const addComment = createAction(
   '[Social] Add Comment',
-  props<{ 
+  props<{
     postId: number;
     content: string;
     parentCommentId?: number;
@@ -227,37 +225,30 @@ export const addComment = createAction(
 
 export const addCommentSuccess = createAction(
   '[Social] Add Comment Success',
-  props<{ comment: any; postId: number }>()
+  props<{
+    postId: number;
+    comment: {
+      id: number;
+      userId: number;
+      user: {
+        id: number;
+        firstName: string;
+        lastName: string;
+        avatarUrl?: string;
+      };
+      content: string;
+      likes: number;
+      isLiked: boolean;
+      createdAt: Date;
+      parentCommentId?: number;
+      replies?: number;
+    };
+  }>()
 );
 
-export const updateComment = createAction(
-  '[Social] Update Comment',
-  props<{ commentId: number; content: string }>()
-);
-
-export const updateCommentSuccess = createAction(
-  '[Social] Update Comment Success',
-  props<{ comment: any }>()
-);
-
-export const deleteComment = createAction(
-  '[Social] Delete Comment',
-  props<{ commentId: number; postId: number }>()
-);
-
-export const deleteCommentSuccess = createAction(
-  '[Social] Delete Comment Success',
-  props<{ commentId: number; postId: number }>()
-);
-
-export const likeComment = createAction(
-  '[Social] Like Comment',
-  props<{ commentId: number }>()
-);
-
-export const likeCommentSuccess = createAction(
-  '[Social] Like Comment Success',
-  props<{ commentId: number; likesCount: number }>()
+export const addCommentFailure = createAction(
+  '[Social] Add Comment Failure',
+  props<{ error: any }>()
 );
 
 // Friends and Following
@@ -284,7 +275,7 @@ export const loadFriendsSuccess = createAction(
 
 export const loadFriendsFailure = createAction(
   '[Social] Load Friends Failure',
-  props<{ error: string }>()
+  props<{ error: any }>()
 );
 
 export const loadFriendRequests = createAction('[Social] Load Friend Requests');
@@ -426,7 +417,7 @@ export const loadClubsSuccess = createAction(
 
 export const loadClubsFailure = createAction(
   '[Social] Load Clubs Failure',
-  props<{ error: string }>()
+  props<{ error: any }>()
 );
 
 export const loadClubDetails = createAction(
@@ -773,7 +764,7 @@ export const loadSocialRecommendationsSuccess = createAction(
 
 export const loadSocialRecommendationsFailure = createAction(
   '[Social] Load Social Recommendations Failure',
-  props<{ error: string }>()
+  props<{ error: any }>()
 );
 
 export const searchUsers = createAction(

@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using FitnessVibe.Domain.Common;
 using FitnessVibe.Domain.Entities.Users;
-using FitnessVibe.Domain.ValueObjects;
+using FitnessVibe.Domain.Enums;
+using FitnessVibe.Domain.Events;
 
 namespace FitnessVibe.Domain.Entities.Activities
 {
@@ -13,255 +14,139 @@ namespace FitnessVibe.Domain.Entities.Activities
     /// </summary>
     public class Activity : BaseEntity
     {
-        public string Name { get; private set; }
+        /// <summary>
+        /// The name of the activity (e.g., "Running", "Yoga", "Weight Training")
+        /// </summary>
+        public string Name { get; private set; } = string.Empty;
+
+        /// <summary>
+        /// Optional detailed description of the activity
+        /// </summary>
         public string? Description { get; private set; }
+
+        /// <summary>
+        /// The type of activity (Indoor, Outdoor, Virtual, Manual)
+        /// </summary>
         public ActivityType Type { get; private set; }
+
+        /// <summary>
+        /// The category of the activity (Cardio, Strength, Flexibility, etc.)
+        /// </summary>
         public ActivityCategory Category { get; private set; }
+
+        /// <summary>
+        /// URL to the activity's icon image
+        /// </summary>
         public string? IconUrl { get; private set; }
-        public decimal MetValue { get; private set; } // Metabolic Equivalent of Task
-        public bool IsActive { get; private set; }
 
-        // Navigation properties
-        public ICollection<UserActivity> UserActivities { get; private set; } = new List<UserActivity>();
+        /// <summary>
+        /// Whether this is a featured activity that should be highlighted to users
+        /// </summary>
+        public bool IsFeatured { get; private set; }
 
-        private Activity() { } // For EF Core
+        /// <summary>
+        /// The difficulty level of this activity (1-5)
+        /// </summary>
+        public int DifficultyLevel { get; private set; }
 
-        public Activity(
+        /// <summary>
+        /// The estimated calories burned per hour for a person of average fitness
+        /// </summary>
+        public int EstimatedCaloriesPerHour { get; private set; }
+
+        /// <summary>
+        /// Navigation property for all user activities of this type
+        /// </summary>
+        public virtual ICollection<UserActivity> UserActivities { get; private set; } = new List<UserActivity>();
+
+        /// <summary>
+        /// Protected constructor for EF Core
+        /// </summary>
+        protected Activity() { }
+
+        /// <summary>
+        /// Creates a new activity template
+        /// </summary>
+        public static Activity Create(
             string name,
             ActivityType type,
             ActivityCategory category,
-            decimal metValue,
+            int difficultyLevel,
+            int estimatedCaloriesPerHour,
             string? description = null,
-            string? iconUrl = null)
+            string? iconUrl = null,
+            bool isFeatured = false)
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Description = description;
-            Type = type;
-            Category = category;
-            MetValue = metValue >= 0 ? metValue : throw new ArgumentException("MET value cannot be negative");
-            IconUrl = iconUrl;
-            IsActive = true;
-        }
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Activity name cannot be empty", nameof(name));
 
-        public void UpdateDetails(string name, string? description = null, string? iconUrl = null)
-        {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Description = description;
-            IconUrl = iconUrl;
-            MarkAsUpdated();
-        }
+            if (difficultyLevel < 1 || difficultyLevel > 5)
+                throw new ArgumentException("Difficulty level must be between 1 and 5", nameof(difficultyLevel));
 
-        public void UpdateMetValue(decimal metValue)
-        {
-            MetValue = metValue >= 0 ? metValue : throw new ArgumentException("MET value cannot be negative");
-            MarkAsUpdated();
-        }
+            if (estimatedCaloriesPerHour <= 0)
+                throw new ArgumentException("Estimated calories must be greater than 0", nameof(estimatedCaloriesPerHour));
 
-        public void Deactivate()
-        {
-            IsActive = false;
-            MarkAsUpdated();
-        }
-    }
-
-    /// <summary>
-    /// UserActivity - a specific instance of a user performing an activity.
-    /// Think of this as a diary entry: "Today I ran 5 kilometers in 30 minutes."
-    /// Each UserActivity captures the who, what, when, where, and how of a fitness session.
-    /// </summary>
-    public class UserActivity : BaseEntity
-    {
-        public int UserId { get; private set; }
-        public User User { get; private set; }
-        public int ActivityId { get; private set; }
-        public Activity Activity { get; private set; }
-        
-        // When and where
-        public DateTime StartedAt { get; private set; }
-        public DateTime CompletedAt { get; private set; }
-        public TimeSpan Duration => CompletedAt - StartedAt;
-        public string? Location { get; private set; }
-        
-        // Performance metrics
-        public decimal? Distance { get; private set; } // in kilometers
-        public int? Steps { get; private set; }
-        public decimal? CaloriesBurned { get; private set; }
-        public decimal? AverageHeartRate { get; private set; }
-        public decimal? MaxHeartRate { get; private set; }
-        public decimal? AveragePace { get; private set; } // minutes per kilometer
-        public decimal? ElevationGain { get; private set; } // in meters
-        
-        // User input
-        public int? UserRating { get; private set; } // 1-5 scale, how did they feel?
-        public string? Notes { get; private set; }
-        public List<string> Photos { get; private set; } = new();
-        
-        // Social and engagement
-        public bool IsPublic { get; private set; }
-        public int ExperiencePointsEarned { get; private set; }
-        
-        // GPS and route data
-        public string? RouteData { get; private set; } // JSON GPS coordinates
-        public string? WeatherConditions { get; private set; } // JSON weather data
-
-        private UserActivity() { } // For EF Core
-
-        public UserActivity(
-            User user,
-            Activity activity,
-            DateTime startedAt,
-            DateTime completedAt,
-            decimal? distance = null,
-            int? steps = null,
-            string? location = null,
-            bool isPublic = false)
-        {
-            User = user ?? throw new ArgumentNullException(nameof(user));
-            UserId = user.Id;
-            Activity = activity ?? throw new ArgumentNullException(nameof(activity));
-            ActivityId = activity.Id;
-            StartedAt = startedAt;
-            CompletedAt = completedAt > startedAt ? completedAt : throw new ArgumentException("Completed time must be after start time");
-            Distance = distance;
-            Steps = steps;
-            Location = location;
-            IsPublic = isPublic;
-
-            // Calculate calories and XP
-            CalculateCaloriesBurned();
-            CalculateExperiencePoints();
-
-            // Award XP to user
-            user.AddExperience(ExperiencePointsEarned);
-            user.RecordActivity();
-
-            AddDomainEvent(new ActivityCompletedEvent(this));
-        }
-
-        public void UpdateMetrics(
-            decimal? distance = null,
-            int? steps = null,
-            decimal? averageHeartRate = null,
-            decimal? maxHeartRate = null,
-            decimal? elevationGain = null)
-        {
-            Distance = distance;
-            Steps = steps;
-            AverageHeartRate = averageHeartRate;
-            MaxHeartRate = maxHeartRate;
-            ElevationGain = elevationGain;
-
-            if (distance.HasValue && Duration.TotalMinutes > 0)
+            var activity = new Activity
             {
-                AveragePace = (decimal)(Duration.TotalMinutes / (double)distance.Value);
-            }
-
-            CalculateCaloriesBurned();
-            MarkAsUpdated();
-        }
-
-        public void UpdateUserFeedback(int rating, string? notes = null)
-        {
-            if (rating < 1 || rating > 5)
-                throw new ArgumentException("Rating must be between 1 and 5");
-
-            UserRating = rating;
-            Notes = notes;
-            MarkAsUpdated();
-        }
-
-        public void AddPhoto(string photoUrl)
-        {
-            if (string.IsNullOrWhiteSpace(photoUrl))
-                throw new ArgumentException("Photo URL cannot be empty");
-
-            Photos.Add(photoUrl);
-            MarkAsUpdated();
-        }
-
-        public void UpdatePrivacy(bool isPublic)
-        {
-            IsPublic = isPublic;
-            MarkAsUpdated();
-        }
-
-        public void UpdateRouteData(string routeData)
-        {
-            RouteData = routeData;
-            MarkAsUpdated();
-        }
-
-        public void UpdateWeatherConditions(string weatherConditions)
-        {
-            WeatherConditions = weatherConditions;
-            MarkAsUpdated();
-        }
-
-        private void CalculateCaloriesBurned()
-        {
-            // Simplified calorie calculation: MET * weight * time
-            // In a real app, you'd get the user's weight from their profile
-            var defaultWeight = 70m; // kg - would come from user profile
-            var hours = (decimal)Duration.TotalHours;
-            CaloriesBurned = Activity.MetValue * defaultWeight * hours;
-        }
-
-        private void CalculateExperiencePoints()
-        {
-            // Base XP calculation
-            var basePoints = (int)Duration.TotalMinutes; // 1 XP per minute
-            
-            // Bonus points for different factors
-            var distanceBonus = Distance.HasValue ? (int)(Distance.Value * 10) : 0; // 10 XP per km
-            var categoryBonus = Activity.Category switch
-            {
-                ActivityCategory.Cardio => 5,
-                ActivityCategory.Strength => 8,
-                ActivityCategory.Sports => 10,
-                ActivityCategory.Outdoor => 12,
-                _ => 0
+                Name = name,
+                Type = type,
+                Category = category,
+                Description = description,
+                IconUrl = iconUrl,
+                IsFeatured = isFeatured,
+                DifficultyLevel = difficultyLevel,
+                EstimatedCaloriesPerHour = estimatedCaloriesPerHour
             };
 
-            ExperiencePointsEarned = basePoints + distanceBonus + categoryBonus;
+            activity.AddDomainEvent(new ActivityEvents.ActivityCreated(activity.Id, name, type, category));
+
+            return activity;
         }
 
-        public decimal GetAverageSpeed()
+        /// <summary>
+        /// Updates the activity's details
+        /// </summary>
+        public void Update(
+            string name,
+            ActivityType type,
+            ActivityCategory category,
+            int difficultyLevel,
+            int estimatedCaloriesPerHour,
+            string? description = null,
+            string? iconUrl = null,
+            bool? isFeatured = null)
         {
-            if (!Distance.HasValue || Duration.TotalHours == 0)
-                return 0;
+            if (!string.IsNullOrWhiteSpace(name))
+                Name = name;
 
-            return Distance.Value / (decimal)Duration.TotalHours; // km/h
+            Type = type;
+            Category = category;
+
+            if (difficultyLevel >= 1 && difficultyLevel <= 5)
+                DifficultyLevel = difficultyLevel;
+
+            if (estimatedCaloriesPerHour > 0)
+                EstimatedCaloriesPerHour = estimatedCaloriesPerHour;
+
+            Description = description;
+            IconUrl = iconUrl;
+
+            if (isFeatured.HasValue)
+                IsFeatured = isFeatured.Value;
+
+            AddDomainEvent(new ActivityEvents.ActivityUpdated(Id, name, type, category));
         }
 
-        public string GetFormattedDuration()
+        /// <summary>
+        /// Set or unset the featured status of the activity
+        /// </summary>
+        public void SetFeatured(bool isFeatured)
         {
-            if (Duration.TotalHours >= 1)
-                return $"{Duration.Hours}h {Duration.Minutes}m";
-            
-            return $"{Duration.Minutes}m {Duration.Seconds}s";
+            if (IsFeatured != isFeatured)
+            {
+                IsFeatured = isFeatured;
+                AddDomainEvent(new ActivityEvents.ActivityFeaturedStatusChanged(Id, isFeatured));
+            }
         }
-    }
-
-    public enum ActivityType
-    {
-        Indoor,
-        Outdoor,
-        Virtual,
-        Manual
-    }
-
-    public enum ActivityCategory
-    {
-        Cardio,
-        Strength,
-        Flexibility,
-        Sports,
-        Recreation,
-        Outdoor,
-        Water,
-        Winter,
-        Martial_Arts,
-        Dance,
-        Other
     }
 }
