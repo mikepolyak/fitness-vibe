@@ -1,10 +1,16 @@
+using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using FitnessVibe.Domain.Entities.Users;
 using FitnessVibe.Domain.Entities.Activities;
 using FitnessVibe.Domain.Entities.Gamification;
-using FitnessVibe.Domain.Entities.Social;
 using FitnessVibe.Domain.Common;
+using FitnessVibe.Domain.Enums;
 using System.Reflection;
+using MediatR;
 
 namespace FitnessVibe.Infrastructure.Data
 {
@@ -15,27 +21,53 @@ namespace FitnessVibe.Infrastructure.Data
     /// </summary>
     public class FitnessVibeDbContext : DbContext
     {
-        public FitnessVibeDbContext(DbContextOptions<FitnessVibeDbContext> options)
+        private readonly IMediator? _mediator;
+
+        /// <summary>
+        /// Initializes a new instance of the FitnessVibeDbContext
+        /// </summary>
+        /// <param name="options">The DbContext options</param>
+        /// <param name="mediator">Optional mediator for publishing domain events</param>
+        public FitnessVibeDbContext(DbContextOptions<FitnessVibeDbContext> options, IMediator? mediator = null)
             : base(options)
         {
+            _mediator = mediator;
         }
 
-        // User-related entities
+        /// <summary>
+        /// Gets or sets the users in the system
+        /// </summary>
         public DbSet<User> Users { get; set; } = null!;
+
+        /// <summary>
+        /// Gets or sets the user goals
+        /// </summary>
         public DbSet<UserGoal> UserGoals { get; set; } = null!;
+
+        /// <summary>
+        /// Gets or sets the user badges
+        /// </summary>
         public DbSet<UserBadge> UserBadges { get; set; } = null!;
 
-        // Activity-related entities
+        /// <summary>
+        /// Gets or sets the available activities
+        /// </summary>
         public DbSet<Activity> Activities { get; set; } = null!;
+
+        /// <summary>
+        /// Gets or sets the user activity records
+        /// </summary>
         public DbSet<UserActivity> UserActivities { get; set; } = null!;
 
-        // Gamification entities
+        /// <summary>
+        /// Gets or sets the available badges
+        /// </summary>
         public DbSet<Badge> Badges { get; set; } = null!;
 
-        // Social entities (to be added in future iterations)
-        // public DbSet<Club> Clubs { get; set; } = null!;
-        // public DbSet<Friendship> Friendships { get; set; } = null!;
-
+        /// <summary>
+        /// Configures the model for this context
+        /// </summary>
+        /// <param name="modelBuilder">The builder being used to construct the model</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -48,50 +80,36 @@ namespace FitnessVibe.Infrastructure.Data
 
             // Configure global query filters for soft deletion
             ConfigureGlobalFilters(modelBuilder);
-
-            // Seed initial data
-            SeedData(modelBuilder);
         }
 
         /// <summary>
-        /// Configure common properties for all entities that inherit from BaseEntity.
-        /// Like setting up standard membership card features for all gym members.
+        /// Configure common properties for all entities that inherit from BaseEntity
         /// </summary>
-        private static void ConfigureBaseEntity(ModelBuilder modelBuilder)
+        private void ConfigureBaseEntity(ModelBuilder modelBuilder)
         {
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
                 {
-                    // Configure primary key
                     modelBuilder.Entity(entityType.ClrType)
-                        .HasKey(nameof(BaseEntity.Id));
-
-                    // Configure audit fields
-                    modelBuilder.Entity(entityType.ClrType)
-                        .Property(nameof(BaseEntity.CreatedAt))
+                        .Property<DateTime>("CreatedAt")
                         .HasDefaultValueSql("GETUTCDATE()");
 
                     modelBuilder.Entity(entityType.ClrType)
-                        .Property(nameof(BaseEntity.UpdatedAt))
-                        .HasDefaultValue(null);
+                        .Property<DateTime>("UpdatedAt")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     modelBuilder.Entity(entityType.ClrType)
-                        .Property(nameof(BaseEntity.IsDeleted))
+                        .Property<bool>("IsDeleted")
                         .HasDefaultValue(false);
-
-                    // Ignore domain events (not persisted)
-                    modelBuilder.Entity(entityType.ClrType)
-                        .Ignore(nameof(BaseEntity.DomainEvents));
                 }
             }
         }
 
         /// <summary>
-        /// Configure global query filters for soft deletion.
-        /// Like automatically filtering out cancelled memberships from normal queries.
+        /// Configure global query filters for soft deletion
         /// </summary>
-        private static void ConfigureGlobalFilters(ModelBuilder modelBuilder)
+        private void ConfigureGlobalFilters(ModelBuilder modelBuilder)
         {
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
@@ -99,182 +117,66 @@ namespace FitnessVibe.Infrastructure.Data
                 {
                     var parameter = Expression.Parameter(entityType.ClrType, "e");
                     var property = Expression.Property(parameter, nameof(BaseEntity.IsDeleted));
-                    var condition = Expression.Equal(property, Expression.Constant(false));
-                    var lambda = Expression.Lambda(condition, parameter);
+                    var filter = Expression.Lambda(Expression.Not(property), parameter);
 
-                    modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+                    modelBuilder.Entity(entityType.ClrType).HasQueryFilter(filter);
                 }
             }
         }
 
         /// <summary>
-        /// Seed initial data for the application.
-        /// Like setting up the initial gym equipment and activity types.
+        /// Saves all changes made in this context to the database and dispatches domain events
         /// </summary>
-        private static void SeedData(ModelBuilder modelBuilder)
-        {
-            // Seed Activities
-            modelBuilder.Entity<Activity>().HasData(
-                new Activity[]
-                {
-                    // Cardio Activities
-                    new(1, "Running", ActivityType.Outdoor, ActivityCategory.Cardio, 8.0m, "Outdoor running", "/assets/icons/running.svg"),
-                    new(2, "Walking", ActivityType.Outdoor, ActivityCategory.Cardio, 3.5m, "Outdoor walking", "/assets/icons/walking.svg"),
-                    new(3, "Cycling", ActivityType.Outdoor, ActivityCategory.Cardio, 7.5m, "Outdoor cycling", "/assets/icons/cycling.svg"),
-                    new(4, "Treadmill", ActivityType.Indoor, ActivityCategory.Cardio, 8.5m, "Treadmill running", "/assets/icons/treadmill.svg"),
-                    new(5, "Elliptical", ActivityType.Indoor, ActivityCategory.Cardio, 6.0m, "Elliptical machine", "/assets/icons/elliptical.svg"),
-                    
-                    // Strength Training
-                    new(6, "Weight Training", ActivityType.Indoor, ActivityCategory.Strength, 4.5m, "Free weights and machines", "/assets/icons/weights.svg"),
-                    new(7, "Bodyweight", ActivityType.Indoor, ActivityCategory.Strength, 3.8m, "Bodyweight exercises", "/assets/icons/bodyweight.svg"),
-                    new(8, "CrossFit", ActivityType.Indoor, ActivityCategory.Strength, 7.0m, "High-intensity functional training", "/assets/icons/crossfit.svg"),
-                    
-                    // Flexibility & Recovery
-                    new(9, "Yoga", ActivityType.Indoor, ActivityCategory.Flexibility, 2.5m, "Yoga practice", "/assets/icons/yoga.svg"),
-                    new(10, "Stretching", ActivityType.Indoor, ActivityCategory.Flexibility, 2.0m, "Stretching routine", "/assets/icons/stretching.svg"),
-                    new(11, "Pilates", ActivityType.Indoor, ActivityCategory.Flexibility, 3.0m, "Pilates workout", "/assets/icons/pilates.svg"),
-                    
-                    // Sports
-                    new(12, "Tennis", ActivityType.Outdoor, ActivityCategory.Sports, 6.0m, "Tennis match or practice", "/assets/icons/tennis.svg"),
-                    new(13, "Basketball", ActivityType.Outdoor, ActivityCategory.Sports, 7.0m, "Basketball game", "/assets/icons/basketball.svg"),
-                    new(14, "Soccer", ActivityType.Outdoor, ActivityCategory.Sports, 8.0m, "Soccer/football game", "/assets/icons/soccer.svg"),
-                    
-                    // Swimming
-                    new(15, "Swimming", ActivityType.Indoor, ActivityCategory.Water, 8.0m, "Pool swimming", "/assets/icons/swimming.svg"),
-                    new(16, "Water Aerobics", ActivityType.Indoor, ActivityCategory.Water, 4.0m, "Water aerobics class", "/assets/icons/water-aerobics.svg")
-                }.Select((activity, index) => 
-                {
-                    // Use reflection to create activities with proper IDs
-                    var activityInstance = (Activity)Activator.CreateInstance(typeof(Activity), true)!;
-                    typeof(Activity).GetProperty("Id")!.SetValue(activityInstance, index + 1);
-                    typeof(Activity).GetProperty("Name")!.SetValue(activityInstance, activity.Name);
-                    typeof(Activity).GetProperty("Type")!.SetValue(activityInstance, activity.Type);
-                    typeof(Activity).GetProperty("Category")!.SetValue(activityInstance, activity.Category);
-                    typeof(Activity).GetProperty("MetValue")!.SetValue(activityInstance, activity.MetValue);
-                    typeof(Activity).GetProperty("Description")!.SetValue(activityInstance, activity.Description);
-                    typeof(Activity).GetProperty("IconUrl")!.SetValue(activityInstance, activity.IconUrl);
-                    typeof(Activity).GetProperty("IsActive")!.SetValue(activityInstance, true);
-                    return activityInstance;
-                }).ToArray()
-            );
-
-            // Seed Badges
-            modelBuilder.Entity<Badge>().HasData(
-                new Badge[]
-                {
-                    // Welcome badges
-                    CreateBadge(1, "Welcome to FitnessVibe", "Completed registration and profile setup", 
-                        BadgeCategory.Achievement, BadgeRarity.Common, 50, "/assets/badges/welcome.svg"),
-                    CreateBadge(2, "First Steps", "Logged your first activity", 
-                        BadgeCategory.Activity, BadgeRarity.Common, 100, "/assets/badges/first-steps.svg"),
-                    
-                    // Activity badges
-                    CreateBadge(3, "Early Bird", "Completed a workout before 7 AM", 
-                        BadgeCategory.Activity, BadgeRarity.Uncommon, 150, "/assets/badges/early-bird.svg"),
-                    CreateBadge(4, "Night Owl", "Completed a workout after 10 PM", 
-                        BadgeCategory.Activity, BadgeRarity.Uncommon, 150, "/assets/badges/night-owl.svg"),
-                    
-                    // Streak badges
-                    CreateBadge(5, "Consistency", "Maintained a 7-day activity streak", 
-                        BadgeCategory.Streak, BadgeRarity.Uncommon, 300, "/assets/badges/consistency.svg"),
-                    CreateBadge(6, "Dedication", "Maintained a 30-day activity streak", 
-                        BadgeCategory.Streak, BadgeRarity.Rare, 1000, "/assets/badges/dedication.svg"),
-                    CreateBadge(7, "Unstoppable", "Maintained a 100-day activity streak", 
-                        BadgeCategory.Streak, BadgeRarity.Epic, 5000, "/assets/badges/unstoppable.svg"),
-                    
-                    // Distance milestones
-                    CreateBadge(8, "First Mile", "Ran or walked your first mile", 
-                        BadgeCategory.Milestone, BadgeRarity.Common, 200, "/assets/badges/first-mile.svg"),
-                    CreateBadge(9, "5K Finisher", "Completed a 5 kilometer distance", 
-                        BadgeCategory.Milestone, BadgeRarity.Uncommon, 500, "/assets/badges/5k-finisher.svg"),
-                    CreateBadge(10, "Marathon Runner", "Completed a marathon distance (42.2 km)", 
-                        BadgeCategory.Milestone, BadgeRarity.Legendary, 10000, "/assets/badges/marathon.svg"),
-                    
-                    // Social badges
-                    CreateBadge(11, "Team Player", "Joined your first club", 
-                        BadgeCategory.Social, BadgeRarity.Common, 200, "/assets/badges/team-player.svg"),
-                    CreateBadge(12, "Motivator", "Gave 100 kudos to other members", 
-                        BadgeCategory.Social, BadgeRarity.Rare, 1000, "/assets/badges/motivator.svg"),
-                    
-                    // Special achievement badges
-                    CreateBadge(13, "Level Up!", "Reached Level 10", 
-                        BadgeCategory.Achievement, BadgeRarity.Rare, 2000, "/assets/badges/level-up.svg"),
-                    CreateBadge(14, "Fitness Legend", "Reached Level 50", 
-                        BadgeCategory.Achievement, BadgeRarity.Legendary, 25000, "/assets/badges/legend.svg")
-                }
-            );
-        }
-
-        /// <summary>
-        /// Helper method to create badge seed data.
-        /// Like setting up achievement certificates with all the right details.
-        /// </summary>
-        private static Badge CreateBadge(int id, string name, string description, 
-            BadgeCategory category, BadgeRarity rarity, int points, string iconUrl)
-        {
-            // Use reflection to create a badge with the private constructor
-            var badge = (Badge)Activator.CreateInstance(typeof(Badge), true)!;
-            typeof(Badge).GetProperty("Id")!.SetValue(badge, id);
-            typeof(Badge).GetProperty("Name")!.SetValue(badge, name);
-            typeof(Badge).GetProperty("Description")!.SetValue(badge, description);
-            typeof(Badge).GetProperty("Category")!.SetValue(badge, category);
-            typeof(Badge).GetProperty("Rarity")!.SetValue(badge, rarity);
-            typeof(Badge).GetProperty("Points")!.SetValue(badge, points);
-            typeof(Badge).GetProperty("IconUrl")!.SetValue(badge, iconUrl);
-            typeof(Badge).GetProperty("IsActive")!.SetValue(badge, true);
-            
-            // Set criteria as JSON string
-            var criteria = new
-            {
-                type = category.ToString().ToLower(),
-                requirements = new { description = description }
-            };
-            typeof(Badge).GetProperty("Criteria")!.SetValue(badge, 
-                System.Text.Json.JsonSerializer.Serialize(criteria));
-            
-            return badge;
-        }
-
-        /// <summary>
-        /// Save changes with domain event processing.
-        /// Like processing all membership updates and triggering appropriate notifications.
-        /// </summary>
+        /// <param name="cancellationToken">A token to observe for cancellation requests</param>
+        /// <returns>The number of state entries written to the database</returns>
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             // Update timestamps for modified entities
-            var entries = ChangeTracker.Entries<BaseEntity>();
-            
-            foreach (var entry in entries)
+            foreach (var entry in ChangeTracker.Entries<BaseEntity>())
             {
-                if (entry.State == EntityState.Modified)
+                switch (entry.State)
                 {
-                    entry.Entity.MarkAsUpdated();
+                    case EntityState.Added:
+                        entry.Property(nameof(BaseEntity.CreatedAt)).CurrentValue = DateTime.UtcNow;
+                        entry.Property(nameof(BaseEntity.UpdatedAt)).CurrentValue = DateTime.UtcNow;
+                        break;
+
+                    case EntityState.Modified:
+                        entry.Property(nameof(BaseEntity.UpdatedAt)).CurrentValue = DateTime.UtcNow;
+                        break;
+
+                    case EntityState.Deleted:
+                        entry.State = EntityState.Modified;
+                        entry.Property(nameof(BaseEntity.IsDeleted)).CurrentValue = true;
+                        entry.Property(nameof(BaseEntity.UpdatedAt)).CurrentValue = DateTime.UtcNow;
+                        break;
                 }
             }
 
-            // Process domain events (implement domain event dispatcher here)
-            var domainEvents = entries
-                .SelectMany(x => x.Entity.DomainEvents)
-                .ToList();
-
-            // Clear domain events
-            foreach (var entry in entries)
-            {
-                entry.Entity.ClearDomainEvents();
-            }
-
-            // Save changes
+            // Save changes first
             var result = await base.SaveChangesAsync(cancellationToken);
 
-            // Dispatch domain events after successful save
-            // TODO: Implement domain event dispatcher
-            // await _domainEventDispatcher.DispatchEventsAsync(domainEvents);
+            // Then dispatch domain events if mediator is available
+            if (_mediator != null)
+            {
+                var entities = ChangeTracker.Entries<BaseEntity>()
+                    .Select(e => e.Entity)
+                    .Where(e => e.DomainEvents.Any())
+                    .ToList();
+
+                foreach (var entity in entities)
+                {
+                    var events = entity.DomainEvents.ToArray();
+                    entity.ClearDomainEvents();
+
+                    foreach (var domainEvent in events)
+                    {
+                        await _mediator.Publish(domainEvent, cancellationToken);
+                    }
+                }
+            }
 
             return result;
         }
     }
-
-    // Extension class for Activity creation in seed data
-    file record Activity(int Id, string Name, ActivityType Type, ActivityCategory Category, 
-        decimal MetValue, string? Description, string? IconUrl);
 }

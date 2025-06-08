@@ -16,12 +16,24 @@ namespace FitnessVibe.Infrastructure.Data.Configurations
         {
             builder.ToTable("Activities");
 
+            // Key configuration
+            builder.HasKey(a => a.Id);
             builder.Property(a => a.Id)
-                .ValueGeneratedNever();
+                .ValueGeneratedNever()
+                .HasColumnType("uniqueidentifier");
 
+            // Audit properties
             builder.Property(a => a.CreatedAt)
                 .IsRequired();
+            
+            builder.Property(a => a.UpdatedAt)
+                .IsRequired(false);
 
+            builder.Property(a => a.IsDeleted)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            // Core properties
             builder.Property(a => a.Name)
                 .IsRequired()
                 .HasMaxLength(100);
@@ -31,11 +43,13 @@ namespace FitnessVibe.Infrastructure.Data.Configurations
 
             builder.Property(a => a.Type)
                 .IsRequired()
-                .HasConversion<string>();
+                .HasConversion<string>()
+                .HasMaxLength(50);
 
             builder.Property(a => a.Category)
                 .IsRequired()
-                .HasConversion<string>();
+                .HasConversion<string>()
+                .HasMaxLength(50);
 
             builder.Property(a => a.IconUrl)
                 .HasMaxLength(2048);
@@ -48,22 +62,18 @@ namespace FitnessVibe.Infrastructure.Data.Configurations
                 .IsRequired()
                 .HasDefaultValue(1);
 
-            builder.Property(a => a.EstimatedCaloriesPerHour)
-                .IsRequired()
-                .HasDefaultValue(0);
+            // Navigation properties
+            builder.HasMany(a => a.UserActivities)
+                .WithOne(ua => ua.Activity)
+                .HasForeignKey(ua => ua.ActivityId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Relationships are handled by UserActivityConfiguration
-
-            // Indexes for filtering and sorting
+            // Indexes
             builder.HasIndex(a => a.Type);
             builder.HasIndex(a => a.Category);
             builder.HasIndex(a => a.IsFeatured);
             builder.HasIndex(a => a.DifficultyLevel);
-            builder.HasIndex(a => a.Name);
-            builder.HasIndex(a => a.CreatedAt);
-
-            // Filter out soft-deleted activities
-            builder.HasQueryFilter(a => !a.IsDeleted);
+            builder.HasIndex(a => a.IsDeleted);
         }
     }
 }

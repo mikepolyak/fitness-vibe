@@ -17,17 +17,17 @@ namespace FitnessVibe.Domain.Common
         /// <summary>
         /// When the entity was created
         /// </summary>
-        public DateTime CreatedAt { get; protected set; }
+        public DateTime CreatedAt { get; internal set; }
 
         /// <summary>
         /// When the entity was last updated
         /// </summary>
-        public DateTime? UpdatedAt { get; protected set; }
+        public DateTime? UpdatedAt { get; internal set; }
 
         /// <summary>
         /// Whether the entity is marked as deleted
         /// </summary>
-        public bool IsDeleted { get; protected set; }
+        public bool IsDeleted { get; internal set; }
 
         private readonly List<IDomainEvent> _domainEvents = new();
 
@@ -46,6 +46,32 @@ namespace FitnessVibe.Domain.Common
         }
 
         /// <summary>
+        /// Adds a new domain event
+        /// </summary>
+        /// <param name="domainEvent">The event to add</param>
+        protected void AddDomainEvent(IDomainEvent domainEvent)
+        {
+            _domainEvents.Add(domainEvent ?? throw new ArgumentNullException(nameof(domainEvent)));
+        }
+
+        /// <summary>
+        /// Removes a domain event
+        /// </summary>
+        /// <param name="domainEvent">The event to remove</param>
+        protected void RemoveDomainEvent(IDomainEvent domainEvent)
+        {
+            _domainEvents.Remove(domainEvent);
+        }
+
+        /// <summary>
+        /// Clears all domain events
+        /// </summary>
+        public void ClearDomainEvents()
+        {
+            _domainEvents.Clear();
+        }
+
+        /// <summary>
         /// Marks the entity as updated, setting the UpdatedAt timestamp
         /// </summary>
         protected void MarkAsUpdated()
@@ -54,33 +80,12 @@ namespace FitnessVibe.Domain.Common
         }
 
         /// <summary>
-        /// Marks the entity as deleted and updates the timestamp
+        /// Marks the entity as deleted
         /// </summary>
-        public void MarkAsDeleted()
+        protected void MarkAsDeleted()
         {
-            if (!IsDeleted)
-            {
-                IsDeleted = true;
-                MarkAsUpdated();
-            }
-        }
-
-        /// <summary>
-        /// Adds a domain event to this entity's collection
-        /// </summary>
-        /// <param name="domainEvent">The event to add</param>
-        public void AddDomainEvent(IDomainEvent domainEvent)
-        {
-            _domainEvents.Add(domainEvent ?? throw new ArgumentNullException(nameof(domainEvent)));
-        }
-
-        /// <summary>
-        /// Removes a domain event from this entity's collection
-        /// </summary>
-        /// <param name="domainEvent">The event to remove</param>
-        public void RemoveDomainEvent(IDomainEvent domainEvent)
-        {
-            _domainEvents.Remove(domainEvent ?? throw new ArgumentNullException(nameof(domainEvent)));
+            IsDeleted = true;
+            MarkAsUpdated();
         }
     }
 }

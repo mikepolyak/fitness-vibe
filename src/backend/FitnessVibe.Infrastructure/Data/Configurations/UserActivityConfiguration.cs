@@ -9,18 +9,44 @@ namespace FitnessVibe.Infrastructure.Data.Configurations
     /// </summary>
     public class UserActivityConfiguration : IEntityTypeConfiguration<UserActivity>
     {
+        /// <summary>
+        /// Configures the UserActivity entity
+        /// </summary>
+        /// <param name="builder">The entity type builder</param>
         public void Configure(EntityTypeBuilder<UserActivity> builder)
         {
-            builder.ToTable("UserActivities");
+            builder.ToTable("UserActivities", tb =>
+            {
+                tb.HasCheckConstraint("CK_UserActivities_DurationMinutes", "[DurationMinutes] > 0");
+                tb.HasCheckConstraint("CK_UserActivities_CaloriesBurned", "[CaloriesBurned] >= 0");
+                tb.HasCheckConstraint("CK_UserActivities_ExperiencePointsEarned", "[ExperiencePointsEarned] >= 0");
+                tb.HasCheckConstraint("CK_UserActivities_IntensityLevel", "[IntensityLevel] BETWEEN 1 AND 5");
+            });
 
+            // Key configuration
+            builder.HasKey(ua => ua.Id);
             builder.Property(ua => ua.Id)
-                .ValueGeneratedNever();
+                .ValueGeneratedNever()
+                .HasColumnType("uniqueidentifier");
 
+            // Audit properties
             builder.Property(ua => ua.CreatedAt)
                 .IsRequired();
+            
+            builder.Property(ua => ua.UpdatedAt)
+                .IsRequired(false)
+                .IsConcurrencyToken();
 
+            builder.Property(ua => ua.IsDeleted)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            // Core properties
             builder.Property(ua => ua.StartedAt)
                 .IsRequired();
+
+            builder.Property(ua => ua.CompletedAt)
+                .IsRequired(false);
 
             builder.Property(ua => ua.DurationMinutes)
                 .IsRequired();
@@ -42,12 +68,14 @@ namespace FitnessVibe.Infrastructure.Data.Configurations
             builder.HasOne(ua => ua.User)
                 .WithMany(u => u.Activities)
                 .HasForeignKey(ua => ua.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
 
             builder.HasOne(ua => ua.Activity)
                 .WithMany(a => a.UserActivities)
                 .HasForeignKey(ua => ua.ActivityId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired();
 
             // Indexes for performance
             builder.HasIndex(ua => ua.UserId);
@@ -56,8 +84,9 @@ namespace FitnessVibe.Infrastructure.Data.Configurations
             builder.HasIndex(ua => ua.StartedAt);
             builder.HasIndex(ua => ua.IntensityLevel);
             builder.HasIndex(ua => ua.CreatedAt);
+            builder.HasIndex(ua => ua.IsDeleted);
 
-            // Filters
+            // Query filter
             builder.HasQueryFilter(ua => !ua.IsDeleted);
         }
     }
