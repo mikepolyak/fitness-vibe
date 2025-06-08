@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using MediatR;
 using FitnessVibe.Application.Commands.Users;
+using FitnessVibe.Application.Queries.Users;
 using System.Security.Claims;
 
 namespace FitnessVibe.API.Controllers
@@ -95,11 +96,13 @@ namespace FitnessVibe.API.Controllers
             {
                 _logger.LogInformation("Login attempt for email: {Email}", request.Email);
 
-                // Create login command (to be implemented)
                 var command = new LoginCommand
                 {
                     Email = request.Email,
-                    Password = request.Password
+                    Password = request.Password,
+                    RememberMe = request.RememberMe,
+                    DeviceInfo = request.DeviceInfo,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
                 };
 
                 var result = await _mediator.Send(command);
@@ -108,13 +111,13 @@ namespace FitnessVibe.API.Controllers
 
                 return Ok(result);
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
                 _logger.LogWarning("Login failed - invalid credentials for email: {Email}", request.Email);
                 return Unauthorized(new ProblemDetails
                 {
                     Title = "Invalid Credentials",
-                    Detail = "The email or password provided is incorrect",
+                    Detail = ex.Message,
                     Status = StatusCodes.Status401Unauthorized
                 });
             }
@@ -148,8 +151,13 @@ namespace FitnessVibe.API.Controllers
                 var userId = GetCurrentUserId();
                 _logger.LogDebug("Getting profile for user: {UserId}", userId);
 
-                // Create get user profile query (to be implemented)
-                var query = new GetUserProfileQuery { UserId = userId };
+                var query = new GetUserProfileQuery 
+                { 
+                    UserId = userId,
+                    IncludeStatistics = true,
+                    IncludeBadges = true,
+                    IncludePreferences = true
+                };
                 var result = await _mediator.Send(query);
 
                 return Ok(result);
@@ -183,15 +191,18 @@ namespace FitnessVibe.API.Controllers
             {
                 _logger.LogDebug("Token refresh attempt");
 
-                // Create refresh token command (to be implemented)
-                var command = new RefreshTokenCommand { RefreshToken = request.RefreshToken };
+                var command = new RefreshTokenCommand 
+                { 
+                    RefreshToken = request.RefreshToken,
+                    DeviceInfo = request.DeviceInfo
+                };
                 var result = await _mediator.Send(command);
 
                 return Ok(result);
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
-                _logger.LogWarning("Token refresh failed - invalid refresh token");
+                _logger.LogWarning("Token refresh failed - invalid refresh token: {Error}", ex.Message);
                 return Unauthorized(new ProblemDetails
                 {
                     Title = "Invalid Refresh Token",
@@ -215,20 +226,25 @@ namespace FitnessVibe.API.Controllers
         /// Logout user and invalidate tokens.
         /// Like checking out of the gym and deactivating your access card.
         /// </summary>
+        /// <param name="request">Logout options</param>
         /// <returns>Logout confirmation</returns>
         /// <response code="200">Logout successful</response>
         [HttpPost("logout")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> Logout()
+        public async Task<ActionResult> Logout([FromBody] LogoutRequest? request = null)
         {
             try
             {
                 var userId = GetCurrentUserId();
                 _logger.LogInformation("User logout: {UserId}", userId);
 
-                // Create logout command (to be implemented)
-                var command = new LogoutCommand { UserId = userId };
+                var command = new LogoutCommand 
+                { 
+                    UserId = userId,
+                    RefreshToken = request?.RefreshToken,
+                    LogoutAllDevices = request?.LogoutAllDevices ?? false
+                };
                 await _mediator.Send(command);
 
                 return Ok(new { message = "Logged out successfully" });
@@ -252,18 +268,20 @@ namespace FitnessVibe.API.Controllers
         /// <param name="request">Email address for password reset</param>
         /// <returns>Password reset confirmation</returns>
         /// <response code="200">Reset email sent</response>
-        /// <response code="404">Email not found</response>
         [HttpPost("forgot-password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
         {
             try
             {
                 _logger.LogInformation("Password reset requested for email: {Email}", request.Email);
 
-                // Create forgot password command (to be implemented)
-                var command = new ForgotPasswordCommand { Email = request.Email };
+                var command = new ForgotPasswordCommand 
+                { 
+                    Email = request.Email,
+                    ClientUrl = request.ClientUrl,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
+                };
                 await _mediator.Send(command);
 
                 // Always return success to prevent email enumeration attacks
@@ -293,11 +311,11 @@ namespace FitnessVibe.API.Controllers
             {
                 _logger.LogInformation("Password reset attempt with token");
 
-                // Create reset password command (to be implemented)
                 var command = new ResetPasswordCommand 
                 { 
                     Token = request.Token,
-                    NewPassword = request.NewPassword
+                    NewPassword = request.NewPassword,
+                    ConfirmPassword = request.ConfirmPassword
                 };
                 await _mediator.Send(command);
 
@@ -309,7 +327,7 @@ namespace FitnessVibe.API.Controllers
                 return BadRequest(new ProblemDetails
                 {
                     Title = "Password Reset Failed",
-                    Detail = "The reset token is invalid or expired",
+                    Detail = ex.Message,
                     Status = StatusCodes.Status400BadRequest
                 });
             }
@@ -342,7 +360,6 @@ namespace FitnessVibe.API.Controllers
             {
                 _logger.LogInformation("Email verification attempt");
 
-                // Create verify email command (to be implemented)
                 var command = new VerifyEmailCommand { Token = request.Token };
                 await _mediator.Send(command);
 
@@ -354,7 +371,7 @@ namespace FitnessVibe.API.Controllers
                 return BadRequest(new ProblemDetails
                 {
                     Title = "Email Verification Failed",
-                    Detail = "The verification token is invalid or expired",
+                    Detail = ex.Message,
                     Status = StatusCodes.Status400BadRequest
                 });
             }
@@ -385,106 +402,42 @@ namespace FitnessVibe.API.Controllers
         }
     }
 
-    // Request/Response DTOs
+    // Enhanced Request/Response DTOs
 
     public class LoginRequest
     {
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public bool RememberMe { get; set; } = false;
+        public string? DeviceInfo { get; set; }
     }
 
-    public class LoginResponse
+    public class LogoutRequest
     {
-        public int UserId { get; set; }
-        public string Email { get; set; } = string.Empty;
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public int Level { get; set; }
-        public int ExperiencePoints { get; set; }
-        public bool IsEmailVerified { get; set; }
-        public string Token { get; set; } = string.Empty;
-        public string RefreshToken { get; set; } = string.Empty;
+        public string? RefreshToken { get; set; }
+        public bool LogoutAllDevices { get; set; } = false;
     }
 
     public class TokenRefreshRequest
     {
         public string RefreshToken { get; set; } = string.Empty;
-    }
-
-    public class TokenRefreshResponse
-    {
-        public string Token { get; set; } = string.Empty;
-        public string RefreshToken { get; set; } = string.Empty;
+        public string? DeviceInfo { get; set; }
     }
 
     public class ForgotPasswordRequest
     {
         public string Email { get; set; } = string.Empty;
+        public string? ClientUrl { get; set; }
     }
 
     public class ResetPasswordRequest
     {
         public string Token { get; set; } = string.Empty;
         public string NewPassword { get; set; } = string.Empty;
+        public string ConfirmPassword { get; set; } = string.Empty;
     }
 
     public class VerifyEmailRequest
-    {
-        public string Token { get; set; } = string.Empty;
-    }
-
-    public class UserProfileResponse
-    {
-        public int Id { get; set; }
-        public string Email { get; set; } = string.Empty;
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public DateTime? DateOfBirth { get; set; }
-        public string? Gender { get; set; }
-        public string? AvatarUrl { get; set; }
-        public string FitnessLevel { get; set; } = string.Empty;
-        public string PrimaryGoal { get; set; } = string.Empty;
-        public int Level { get; set; }
-        public int ExperiencePoints { get; set; }
-        public bool IsEmailVerified { get; set; }
-        public DateTime LastActiveDate { get; set; }
-        public DateTime CreatedAt { get; set; }
-    }
-
-    // Placeholder command classes (to be implemented in Application layer)
-    public class LoginCommand : IRequest<LoginResponse>
-    {
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-    }
-
-    public class GetUserProfileQuery : IRequest<UserProfileResponse>
-    {
-        public int UserId { get; set; }
-    }
-
-    public class RefreshTokenCommand : IRequest<TokenRefreshResponse>
-    {
-        public string RefreshToken { get; set; } = string.Empty;
-    }
-
-    public class LogoutCommand : IRequest
-    {
-        public int UserId { get; set; }
-    }
-
-    public class ForgotPasswordCommand : IRequest
-    {
-        public string Email { get; set; } = string.Empty;
-    }
-
-    public class ResetPasswordCommand : IRequest
-    {
-        public string Token { get; set; } = string.Empty;
-        public string NewPassword { get; set; } = string.Empty;
-    }
-
-    public class VerifyEmailCommand : IRequest
     {
         public string Token { get; set; } = string.Empty;
     }
