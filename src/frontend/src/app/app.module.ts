@@ -10,6 +10,11 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
 
+// Store Effects
+import { UserProfileEffects } from './store/user-profile/user-profile.effects';
+import { NutritionEffects } from './store/nutrition/nutrition.effects';
+import { SettingsEffects } from './store/settings/settings.effects';
+
 // Angular Material
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -52,31 +57,24 @@ import { environment } from '../environments/environment';
       registrationStrategy: 'registerWhenStable:30000'
     }),
 
-    // NgRx Store Setup - our app's memory system
-    StoreModule.forRoot(appReducers, {
-      metaReducers: environment.production ? [] : [],
-      runtimeChecks: {
-        strictStateImmutability: true,
-        strictActionImmutability: true,
-        strictStateSerializability: true,
-        strictActionSerializability: true
-      }
-    }),
-
-    // Effects for handling side effects (API calls, etc.)
-    EffectsModule.forRoot([]),
-
-    // Router integration with store
+    // Store Configuration
+    StoreModule.forRoot(appReducers),
+    EffectsModule.forRoot([
+      UserProfileEffects,
+      NutritionEffects,
+      SettingsEffects
+    ]),
     StoreRouterConnectingModule.forRoot(),
-
-    // DevTools for development
     StoreDevtoolsModule.instrument({
       maxAge: 25,
-      logOnly: environment.production,
-      connectInZone: true
+      logOnly: environment.production
     }),
 
-    // Angular Material Modules
+    // Feature Modules
+    CoreModule,
+    SharedModule,
+
+    // Material Modules
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
@@ -84,11 +82,7 @@ import { environment } from '../environments/environment';
     MatListModule,
     MatCardModule,
     MatProgressBarModule,
-    MatSnackBarModule,
-
-    // App Modules
-    CoreModule,
-    SharedModule
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

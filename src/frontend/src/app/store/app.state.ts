@@ -4,10 +4,13 @@ import { environment } from '../../environments/environment';
 
 // Feature state imports
 import { AuthState, authReducer } from './auth/auth.reducer';
-// TODO: Import other reducers as they are implemented
-// import { UserState, userReducer } from './user/user.reducer';
-// import { ActivityState, activityReducer } from './activity/activity.reducer';
-// import { GamificationState, gamificationReducer } from './gamification/gamification.reducer';
+import { ActivitiesState, activitiesReducer } from './activities/activities.reducer';
+import { GamificationState, gamificationReducer } from './gamification/gamification.reducer';
+import { GoalsState, goalsReducer } from './goals/goals.reducer';
+import { SocialState, socialReducer } from './social/social.reducer';
+import { UserProfileState, userProfileReducer } from './user-profile/user-profile.reducer';
+import { NutritionState, nutritionReducer } from './nutrition/nutrition.reducer';
+import { SettingsState, settingsReducer } from './settings/settings.reducer';
 
 /**
  * Main application state interface - the central nervous system of our app.
@@ -17,10 +20,13 @@ import { AuthState, authReducer } from './auth/auth.reducer';
 export interface AppState {
   router: RouterReducerState<any>;
   auth: AuthState;
-  // TODO: Add other feature states as they are implemented
-  // user: UserState;
-  // activity: ActivityState;
-  // gamification: GamificationState;
+  activities: ActivitiesState;
+  gamification: GamificationState;
+  goals: GoalsState;
+  social: SocialState;
+  userProfile: UserProfileState;
+  nutrition: NutritionState;
+  settings: SettingsState;
 }
 
 /**
@@ -29,11 +35,14 @@ export interface AppState {
  */
 export const appReducers: ActionReducerMap<AppState> = {
   router: routerReducer,
-  auth: authReducer
-  // TODO: Add other reducers as they are implemented
-  // user: userReducer,
-  // activity: activityReducer,
-  // gamification: gamificationReducer
+  auth: authReducer,
+  activities: activitiesReducer,
+  gamification: gamificationReducer,
+  goals: goalsReducer,
+  social: socialReducer,
+  userProfile: userProfileReducer,
+  nutrition: nutritionReducer,
+  settings: settingsReducer
 };
 
 /**
