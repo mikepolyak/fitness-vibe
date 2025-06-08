@@ -1,0 +1,33 @@
+<div class="activity-summary">
+  <div class="summary-card">
+    <div class="metric">
+      <i class="fas fa-shoe-prints"></i>
+      <span class="value">{{summary.steps | number}}</span>
+      <span class="label">Steps</span>
+    </div>
+  </div>
+  
+  <div class="summary-card">
+    <div class="metric">
+      <i class="fas fa-fire"></i>
+      <span class="value">{{summary.calories | number}}</span>
+      <span class="label">Calories</span>
+    </div>
+  </div>
+  
+  <div class="summary-card">
+    <div class="metric">
+      <i class="fas fa-clock"></i>
+      <span class="value">{{summary.activeMinutes | number}}</span>
+      <span class="label">Active Minutes</span>
+    </div>
+  </div>
+  
+  <div class="summary-card">
+    <div class="metric">
+      <i class="fas fa-route"></i>
+      <span class="value">{{summary.distance | number:'1.1-1'}}</span>
+      <span class="label">Distance (km)</span>
+    </div>
+  </div>
+</div>

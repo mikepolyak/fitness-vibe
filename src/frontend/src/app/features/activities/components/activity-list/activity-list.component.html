@@ -1,0 +1,94 @@
+<div class="activities-page">
+  <header class="activities-header">
+    <div class="header-content">
+      <h1>Activities</h1>
+      <button class="add-activity-btn" (click)="onAddActivity()">
+        <i class="fas fa-plus"></i> Log Activity
+      </button>
+    </div>
+
+    <div class="filters">
+      <mat-button-toggle-group [(ngModel)]="selectedFilter" (change)="filterActivities()">
+        <mat-button-toggle value="all">All</mat-button-toggle>
+        <mat-button-toggle value="completed">Completed</mat-button-toggle>
+        <mat-button-toggle value="in-progress">In Progress</mat-button-toggle>
+        <mat-button-toggle value="planned">Planned</mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-form-field appearance="outline" class="type-filter">
+        <mat-label>Activity Type</mat-label>
+        <mat-select [(ngModel)]="selectedType" (selectionChange)="filterActivities()">
+          <mat-option value="all">All Types</mat-option>
+          <mat-option value="running">Running</mat-option>
+          <mat-option value="cycling">Cycling</mat-option>
+          <mat-option value="swimming">Swimming</mat-option>
+          <mat-option value="walking">Walking</mat-option>
+          <mat-option value="gym">Gym</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </header>
+
+  <div class="activities-grid">
+    <mat-card *ngFor="let activity of filteredActivities" 
+              class="activity-card"
+              [class.completed]="activity.status === 'completed'"
+              [class.in-progress]="activity.status === 'in-progress'"
+              [class.planned]="activity.status === 'planned'"
+              (click)="viewActivity(activity.id)">
+      
+      <mat-card-header>
+        <div mat-card-avatar [class]="'activity-icon ' + activity.type">
+          <i [class]="getActivityIcon(activity.type)"></i>
+        </div>
+        <mat-card-title>{{activity.title}}</mat-card-title>
+        <mat-card-subtitle>{{activity.date | date:'medium'}}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="activity-stats">
+          <div class="stat">
+            <i class="far fa-clock"></i>
+            <span>{{activity.duration}} min</span>
+          </div>
+          
+          <div class="stat" *ngIf="activity.distance">
+            <i class="fas fa-route"></i>
+            <span>{{activity.distance}} km</span>
+          </div>
+          
+          <div class="stat">
+            <i class="fas fa-fire"></i>
+            <span>{{activity.calories}} cal</span>
+          </div>
+
+          <div class="stat">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>{{activity.intensity | titlecase}}</span>
+          </div>
+        </div>
+
+        <p *ngIf="activity.description" class="activity-description">
+          {{activity.description}}
+        </p>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button color="primary" (click)="$event.stopPropagation(); editActivity(activity.id)">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        <button mat-button [color]="activity.status === 'completed' ? 'accent' : 'primary'"
+                (click)="$event.stopPropagation(); toggleStatus(activity)">
+          <i class="fas" [class.fa-check-circle]="activity.status === 'completed'"
+                       [class.fa-play-circle]="activity.status === 'in-progress'"
+                       [class.fa-clock]="activity.status === 'planned'"></i>
+          {{activity.status === 'completed' ? 'Completed' : 
+            activity.status === 'in-progress' ? 'In Progress' : 'Start'}}
+        </button>
+        <button mat-button color="warn" (click)="$event.stopPropagation(); deleteActivity(activity.id)">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

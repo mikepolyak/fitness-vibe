@@ -1,0 +1,113 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <div class="profile-cover">
+      <div class="profile-avatar">
+        <img src="assets/images/default-avatar.png" alt="Profile Picture">
+        <button class="edit-avatar">
+          <i class="material-icons">edit</i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="profile-info">
+      <div class="profile-main-info">
+        <h1>{{ userProfile.name }}</h1>
+        <div class="profile-level">
+          <span class="level">Level {{ userProfile.level }}</span>
+          <div class="progress-bar">
+            <div class="progress" [style.width.%]="(userProfile.points % 1000) / 10"></div>
+          </div>
+          <span class="points">{{ userProfile.points }} XP</span>
+        </div>
+      </div>
+      
+      <div class="profile-stats">
+        <div class="stat-item">
+          <i class="material-icons">calendar_today</i>
+          <span>Member since {{ userProfile.joinedDate | date:'mediumDate' }}</span>
+        </div>
+        <div class="stat-item">
+          <i class="material-icons">fitness_center</i>
+          <span>{{ userProfile.activities }} Activities</span>
+        </div>
+        <div class="stat-item">
+          <i class="material-icons">emoji_events</i>
+          <span>{{ userProfile.achievements }} Achievements</span>
+        </div>
+        <div class="stat-item">
+          <i class="material-icons">local_fire_department</i>
+          <span>{{ userProfile.streakDays }} Day Streak</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="profile-tabs">
+    <div 
+      *ngFor="let tab of tabs"
+      class="tab"
+      [class.active]="isTabActive(tab.id)"
+      (click)="setActiveTab(tab.id)">
+      <i class="material-icons">{{ tab.icon }}</i>
+      {{ tab.label }}
+    </div>
+  </nav>
+
+  <div class="profile-content" [ngSwitch]="activeTab">
+    <!-- Overview Tab -->
+    <div *ngSwitchCase="'overview'" class="tab-content">
+      <div class="content-grid">
+        <div class="card">
+          <h2>About Me</h2>
+          <button class="edit-button">
+            <i class="material-icons">edit</i>
+          </button>
+          <div class="about-content">
+            <p>Share a bit about yourself and your fitness journey...</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Goals</h2>
+          <button class="edit-button">
+            <i class="material-icons">edit</i>
+          </button>
+          <div class="goals-content">
+            <p>Your fitness goals will appear here...</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Preferences</h2>
+          <button class="edit-button">
+            <i class="material-icons">edit</i>
+          </button>
+          <div class="preferences-content">
+            <p>Your workout preferences will be shown here...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activities Tab -->
+    <div *ngSwitchCase="'activities'" class="tab-content">
+      <div class="activities-timeline">
+        <p>Your recent activities will be displayed here...</p>
+      </div>
+    </div>
+
+    <!-- Achievements Tab -->
+    <div *ngSwitchCase="'achievements'" class="tab-content">
+      <div class="achievements-grid">
+        <p>Your achievements and badges will be shown here...</p>
+      </div>
+    </div>
+
+    <!-- Statistics Tab -->
+    <div *ngSwitchCase="'stats'" class="tab-content">
+      <div class="stats-dashboard">
+        <p>Your fitness statistics and analytics will appear here...</p>
+      </div>
+    </div>
+  </div>
+</div>

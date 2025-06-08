@@ -1,0 +1,38 @@
+.activity-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.metric i {
+  font-size: 24px;
+  color: #4CAF50;
+  margin-bottom: 8px;
+}
+
+.value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.label {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+}

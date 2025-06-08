@@ -1,0 +1,48 @@
+.gamification-container {
+  padding: 2rem;
+
+  h1 {
+    margin-bottom: 2rem;
+    color: #333;
+  }
+}
+
+.gamification-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.gamification-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  h2 {
+    color: #444;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+  }
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.achievements-list,
+.leaderboard-list {
+  min-height: 200px;
+  
+  p {
+    color: #666;
+  }
+}

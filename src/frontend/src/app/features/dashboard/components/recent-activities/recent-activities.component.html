@@ -1,0 +1,31 @@
+<div class="activities-container">
+  <div *ngFor="let activity of recentActivities" class="activity-card">
+    <div class="activity-icon" [ngClass]="activity.type">
+      <i [class]="getActivityIcon(activity.type)"></i>
+    </div>
+    
+    <div class="activity-details">
+      <div class="activity-header">
+        <h4>{{activity.title}}</h4>
+        <span class="activity-date">{{activity.date | date:'shortTime'}}</span>
+      </div>
+      
+      <div class="activity-stats">
+        <span>
+          <i class="far fa-clock"></i>
+          {{activity.duration | number}} min
+        </span>
+        
+        <span *ngIf="activity.distance">
+          <i class="fas fa-route"></i>
+          {{activity.distance | number:'1.1-1'}} km
+        </span>
+        
+        <span>
+          <i class="fas fa-fire"></i>
+          {{activity.calories | number}} cal
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

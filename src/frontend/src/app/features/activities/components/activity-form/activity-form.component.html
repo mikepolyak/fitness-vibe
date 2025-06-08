@@ -1,0 +1,105 @@
+<div class="form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{isEditing ? 'Edit' : 'Log'}} Activity</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="activityForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Title</mat-label>
+            <input matInput formControlName="title" placeholder="Morning Run">
+            <mat-error *ngIf="activityForm.get('title')?.hasError('required')">
+              Title is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Activity Type</mat-label>
+            <mat-select formControlName="type">
+              <mat-option value="running">Running</mat-option>
+              <mat-option value="cycling">Cycling</mat-option>
+              <mat-option value="swimming">Swimming</mat-option>
+              <mat-option value="walking">Walking</mat-option>
+              <mat-option value="gym">Gym</mat-option>
+            </mat-select>
+            <mat-error *ngIf="activityForm.get('type')?.hasError('required')">
+              Activity type is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Duration (minutes)</mat-label>
+            <input matInput type="number" formControlName="duration">
+            <mat-error *ngIf="activityForm.get('duration')?.hasError('required')">
+              Duration is required
+            </mat-error>
+            <mat-error *ngIf="activityForm.get('duration')?.hasError('min')">
+              Duration must be greater than 0
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Distance (km)</mat-label>
+            <input matInput type="number" formControlName="distance">
+            <mat-error *ngIf="activityForm.get('distance')?.hasError('min')">
+              Distance must be greater than 0
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Calories</mat-label>
+            <input matInput type="number" formControlName="calories">
+            <mat-error *ngIf="activityForm.get('calories')?.hasError('required')">
+              Calories is required
+            </mat-error>
+            <mat-error *ngIf="activityForm.get('calories')?.hasError('min')">
+              Calories must be greater than 0
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="activityForm.get('date')?.hasError('required')">
+              Date is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Intensity</mat-label>
+            <mat-select formControlName="intensity">
+              <mat-option value="low">Low</mat-option>
+              <mat-option value="medium">Medium</mat-option>
+              <mat-option value="high">High</mat-option>
+            </mat-select>
+            <mat-error *ngIf="activityForm.get('intensity')?.hasError('required')">
+              Intensity is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="4"></textarea>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button type="button" mat-raised-button class="cancel-btn" (click)="onCancel()">
+            Cancel
+          </button>
+          <button type="submit" mat-raised-button class="submit-btn" [disabled]="activityForm.invalid">
+            {{isEditing ? 'Update' : 'Create'}} Activity
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

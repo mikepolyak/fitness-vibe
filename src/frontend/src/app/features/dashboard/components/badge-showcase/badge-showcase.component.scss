@@ -1,0 +1,70 @@
+.badges-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.badge-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: white;
+  transition: transform 0.2s ease;
+}
+
+.badge-card:hover {
+  transform: translateY(-2px);
+}
+
+.badge-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 24px;
+}
+
+.badge-info {
+  flex: 1;
+}
+
+h4 {
+  margin: 0 0 4px 0;
+  color: #333;
+}
+
+p {
+  margin: 0 0 8px 0;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.earned-date {
+  font-size: 0.8em;
+  color: #888;
+}
+
+/* Rarity styles */
+.common .badge-icon {
+  background: #E0E0E0;
+  color: #757575;
+}
+
+.rare .badge-icon {
+  background: #2196F3;
+  color: white;
+}
+
+.epic .badge-icon {
+  background: #9C27B0;
+  color: white;
+}
+
+.legendary .badge-icon {
+  background: #FFD700;
+  color: #333;
+}

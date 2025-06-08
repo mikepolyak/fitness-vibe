@@ -1,0 +1,195 @@
+.onboarding-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.onboarding-progress {
+  margin-bottom: 3rem;
+
+  .progress-bar {
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+    position: relative;
+
+    .progress {
+      position: absolute;
+      height: 100%;
+      background: #4CAF50;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+  }
+
+  .step-indicators {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+
+    .step-indicator {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &.active {
+        border-color: #4CAF50;
+        background: #4CAF50;
+        color: white;
+      }
+
+      &.completed {
+        background: #4CAF50;
+        border-color: #4CAF50;
+        color: white;
+      }
+    }
+  }
+}
+
+.onboarding-content {
+  flex: 1;
+  
+  .step-content {
+    animation: fadeIn 0.3s ease;
+
+    h1, h2 {
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    p {
+      color: #666;
+      margin-bottom: 2rem;
+    }
+  }
+}
+
+.welcome-image {
+  height: 300px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.onboarding-form {
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #444;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+
+      &:focus {
+        outline: none;
+        border-color: #4CAF50;
+      }
+    }
+  }
+}
+
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.goal-card {
+  background: #f8f8f8;
+  padding: 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f0f0f0;
+  }
+
+  input[type="checkbox"] {
+    margin-right: 0.5rem;
+  }
+
+  label {
+    cursor: pointer;
+  }
+}
+
+.radio-group,
+.checkbox-group {
+  display: flex;
+  gap: 1rem;
+  
+  label {
+    margin-left: 0.25rem;
+  }
+}
+
+.onboarding-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+
+  button {
+    padding: 0.75rem 2rem;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &.btn-primary {
+      background: #4CAF50;
+      color: white;
+      border: none;
+
+      &:hover {
+        background: #45a049;
+      }
+    }
+
+    &.btn-secondary {
+      background: white;
+      color: #666;
+      border: 1px solid #ddd;
+
+      &:hover {
+        background: #f5f5f5;
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

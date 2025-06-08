@@ -1,0 +1,79 @@
+.goals-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.goal-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+h3 {
+  margin: 0;
+  color: #333;
+}
+
+.due-date {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.almost-complete {
+  background: #4CAF50;
+}
+
+.on-track {
+  background: #2196F3;
+}
+
+.needs-work {
+  background: #FFC107;
+}
+
+.progress-stats {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.9em;
+}
+
+.current {
+  font-weight: bold;
+  color: #333;
+}
+
+.separator {
+  color: #666;
+}
+
+.target {
+  color: #666;
+}

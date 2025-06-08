@@ -1,0 +1,436 @@
+.social-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+// Navigation
+.social-nav {
+  display: flex;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    color: #666;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    i {
+      font-size: 24px;
+    }
+
+    &:hover {
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    &.active {
+      background: #4CAF50;
+      color: white;
+    }
+  }
+}
+
+// Feed Layout
+.feed-container {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2rem;
+}
+
+// Main Content
+.main-content {
+  .create-post {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .post-input {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+
+      input {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        font-size: 1rem;
+
+        &:focus {
+          outline: none;
+          border-color: #4CAF50;
+        }
+      }
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 1rem;
+      border-top: 1px solid #eee;
+      padding-top: 1rem;
+
+      .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        border-radius: 4px;
+
+        &:hover {
+          background: #f5f5f5;
+          color: #333;
+        }
+
+        i {
+          font-size: 20px;
+        }
+      }
+
+      .post-btn {
+        margin-left: auto;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        border-radius: 20px;
+        font-weight: 500;
+        cursor: pointer;
+
+        &:hover {
+          background: #45a049;
+        }
+      }
+    }
+  }
+}
+
+// Posts
+.post-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .post-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    .user-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+    }
+
+    .post-info {
+      h3 {
+        margin: 0;
+        color: #333;
+      }
+
+      .timestamp {
+        color: #666;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .post-content {
+    margin-bottom: 1rem;
+
+    p {
+      margin: 0 0 1rem;
+      color: #333;
+    }
+
+    .post-media {
+      img {
+        width: 100%;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+      }
+    }
+  }
+
+  .post-actions {
+    display: flex;
+    gap: 1rem;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: none;
+      border: none;
+      color: #666;
+      cursor: pointer;
+      border-radius: 4px;
+
+      &:hover {
+        background: #f5f5f5;
+        color: #333;
+      }
+
+      i {
+        font-size: 20px;
+      }
+    }
+  }
+}
+
+// Sidebar Components
+.side-content {
+  .suggestions-card,
+  .groups-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    h2 {
+      margin: 0 0 1rem;
+      color: #333;
+      font-size: 1.25rem;
+    }
+  }
+
+  .suggestion-item,
+  .group-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #eee;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .user-avatar,
+    .group-image {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .suggestion-info,
+    .group-info {
+      flex: 1;
+
+      h3 {
+        margin: 0;
+        color: #333;
+        font-size: 1rem;
+      }
+
+      p {
+        margin: 0;
+        color: #666;
+        font-size: 0.9rem;
+      }
+    }
+
+    .add-btn,
+    .join-btn {
+      padding: 0.5rem 1rem;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 500;
+
+      &:hover {
+        background: #45a049;
+      }
+    }
+  }
+}
+
+// Friends Tab
+.friends-container {
+  .friends-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .friend-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .friend-header {
+      position: relative;
+      width: fit-content;
+      margin: 0 auto 1rem;
+
+      .friend-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+      }
+
+      .status-indicator {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        background: #666;
+
+        &.online {
+          background: #4CAF50;
+        }
+      }
+    }
+
+    .friend-info {
+      h3 {
+        margin: 0 0 0.5rem;
+        color: #333;
+      }
+
+      .level {
+        color: #4CAF50;
+        font-weight: 500;
+        margin: 0 0 0.5rem;
+      }
+
+      .status {
+        color: #666;
+        font-size: 0.9rem;
+        margin: 0;
+      }
+    }
+
+    .friend-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+
+      .action-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: #f5f5f5;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: #4CAF50;
+          color: white;
+        }
+
+        i {
+          font-size: 20px;
+        }
+      }
+    }
+  }
+}
+
+// Challenges & Groups Placeholders
+.challenges-container,
+.groups-container {
+  background: #fff;
+  border-radius: 8px;
+  padding: 3rem;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    margin: 0 0 1rem;
+    color: #333;
+  }
+
+  p {
+    color: #666;
+    margin: 0;
+  }
+}
+
+// Responsive Design
+@media (max-width: 992px) {
+  .feed-container {
+    grid-template-columns: 1fr;
+  }
+
+  .social-nav {
+    padding: 0.25rem;
+
+    .nav-item {
+      padding: 0.75rem;
+      font-size: 0.9rem;
+
+      i {
+        font-size: 20px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .social-container {
+    padding: 1rem;
+  }
+
+  .create-post {
+    .post-actions {
+      flex-wrap: wrap;
+
+      .action-btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .post-btn {
+        width: 100%;
+        margin-top: 0.5rem;
+      }
+    }
+  }
+
+  .friends-list {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}

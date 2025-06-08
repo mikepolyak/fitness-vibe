@@ -1,0 +1,133 @@
+<div class="details-container" *ngIf="activity">
+  <div class="header-section">
+    <button mat-icon-button (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+      <div class="activity-title">
+      <div [class]="'activity-icon ' + activity.activity.category">
+        <i class="material-icons">{{getActivityIcon(activity.activity.category)}}</i>
+      </div>
+      <div class="title-content">
+        <h1>{{activity.activity.name}}</h1>
+        <span class="date">{{activity.startedAt | date:'fullDate'}}</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <i class="fas fa-ellipsis-v"></i>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="editActivity()">
+          <i class="fas fa-edit"></i>
+          <span>Edit Activity</span>
+        </button>
+        <button mat-menu-item (click)="shareActivity()">
+          <i class="fas fa-share"></i>
+          <span>Share Activity</span>
+        </button>
+        <button mat-menu-item (click)="deleteActivity()">
+          <i class="fas fa-trash"></i>
+          <span>Delete Activity</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-left">
+      <mat-card class="stats-card">
+        <mat-card-content>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <i class="far fa-clock"></i>
+              <span class="value">{{activity.duration}}</span>
+              <span class="label">Minutes</span>
+            </div>
+            
+            <div class="stat-item" *ngIf="activity.distance">
+              <i class="fas fa-route"></i>
+              <span class="value">{{activity.distance}}</span>
+              <span class="label">Kilometers</span>
+            </div>
+            
+            <div class="stat-item">
+              <i class="fas fa-fire"></i>              <span class="value">{{activity.caloriesBurned}}</span>
+              <span class="label">Calories</span>
+            </div>
+
+            <div class="stat-item">
+              <i class="fas fa-dumbbell"></i>
+              <span class="value">{{activity.activity.metValue | number:'1.1-1'}}</span>
+              <span class="label">MET</span>
+            </div>
+
+            <div class="stat-item" *ngIf="activity.averagePace">
+              <i class="fas fa-running"></i>
+              <span class="value">{{activity.averagePace | number:'1.1-2'}}</span>
+              <span class="label">Min/Km</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>      <mat-card class="detail-card" *ngIf="activity.notes">
+        <h2>Notes</h2>
+        <mat-card-content>
+          <p>{{activity.notes}}</p>
+        </mat-card-content>
+      </mat-card>      <mat-card class="detail-card" *ngIf="activity.routeData">
+        <h2>Route</h2>
+        <mat-card-content class="route-info">
+          <div class="route-points">
+            <ng-container *ngIf="routeInfo$ | async as routeInfo">
+              <div class="point">
+                <div class="point-label">Start</div>
+                <div class="point-value">{{routeInfo.startPoint}}</div>
+              </div>
+              <div class="point">
+                <div class="point-label">End</div>
+                <div class="point-value">{{routeInfo.endPoint}}</div>
+              </div>
+            </ng-container>
+          </div>
+          <!-- Map will be added here -->
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="content-right">      <mat-card class="detail-card" *ngIf="activity.averageHeartRate || activity.maxHeartRate">
+        <h2>Heart Rate</h2>
+        <mat-card-content class="heart-rate-info">
+          <div class="rate-item" *ngIf="activity.averageHeartRate">
+            <div class="rate-label">Average</div>
+            <div class="rate-value">{{activity.averageHeartRate}}</div>
+          </div>
+          <div class="rate-item" *ngIf="activity.maxHeartRate">
+            <div class="rate-label">Max</div>
+            <div class="rate-value">{{activity.maxHeartRate}}</div>
+          </div>
+        </mat-card-content>
+      </mat-card>      <mat-card class="detail-card" *ngIf="activity.weatherConditions">
+        <h2>Weather</h2>
+        <mat-card-content class="weather-info">
+          <ng-container *ngIf="weatherInfo$ | async as weather">
+            <div class="weather-item">
+              <i class="fas fa-thermometer-half"></i>
+              <div class="weather-value">{{weather.temperature}}°C</div>
+              <div class="weather-label">Temperature</div>
+            </div>
+            <div class="weather-item">
+              <i class="fas fa-tint"></i>
+              <div class="weather-value">{{weather.humidity}}%</div>
+              <div class="weather-label">Humidity</div>
+            </div>
+            <div class="weather-item">
+              <i class="fas fa-cloud"></i>
+              <div class="weather-value">{{weather.condition}}</div>
+              <div class="weather-label">Condition</div>
+            </div>
+          </ng-container>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

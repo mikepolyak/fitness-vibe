@@ -1,0 +1,130 @@
+<div class="onboarding-container">
+  <div class="onboarding-progress">
+    <div class="progress-bar">
+      <div class="progress" [style.width.%]="(currentStep / totalSteps) * 100"></div>
+    </div>
+    <div class="step-indicators">
+      <div 
+        *ngFor="let step of [1,2,3,4]" 
+        class="step-indicator" 
+        [class.active]="currentStep === step"
+        [class.completed]="currentStep > step"
+        (click)="goToStep(step)">
+        {{ step }}
+      </div>
+    </div>
+  </div>
+
+  <div class="onboarding-content" [ngSwitch]="currentStep">
+    <!-- Step 1: Welcome -->
+    <div *ngSwitchCase="1" class="step-content">
+      <h1>Welcome to FitnessVibe!</h1>
+      <p>Let's get started on your fitness journey. We'll help you set up your profile and preferences.</p>
+      <div class="welcome-image"></div>
+    </div>
+
+    <!-- Step 2: Personal Info -->
+    <div *ngSwitchCase="2" class="step-content">
+      <h2>Tell us about yourself</h2>
+      <form class="onboarding-form">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="number" id="age" placeholder="Enter your age">
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <div class="radio-group">
+            <input type="radio" id="male" name="gender" value="male">
+            <label for="male">Male</label>
+            <input type="radio" id="female" name="gender" value="female">
+            <label for="female">Female</label>
+            <input type="radio" id="other" name="gender" value="other">
+            <label for="other">Other</label>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 3: Fitness Goals -->
+    <div *ngSwitchCase="3" class="step-content">
+      <h2>What are your fitness goals?</h2>
+      <div class="goals-grid">
+        <div class="goal-card">
+          <input type="checkbox" id="weightLoss">
+          <label for="weightLoss">Weight Loss</label>
+        </div>
+        <div class="goal-card">
+          <input type="checkbox" id="muscleGain">
+          <label for="muscleGain">Muscle Gain</label>
+        </div>
+        <div class="goal-card">
+          <input type="checkbox" id="endurance">
+          <label for="endurance">Endurance</label>
+        </div>
+        <div class="goal-card">
+          <input type="checkbox" id="flexibility">
+          <label for="flexibility">Flexibility</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Preferences -->
+    <div *ngSwitchCase="4" class="step-content">
+      <h2>Set your preferences</h2>
+      <form class="onboarding-form">
+        <div class="form-group">
+          <label for="frequency">Workout Frequency (per week)</label>
+          <select id="frequency">
+            <option value="1-2">1-2 times</option>
+            <option value="3-4">3-4 times</option>
+            <option value="5+">5+ times</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="duration">Preferred Workout Duration</label>
+          <select id="duration">
+            <option value="15-30">15-30 minutes</option>
+            <option value="30-60">30-60 minutes</option>
+            <option value="60+">60+ minutes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preferred Time</label>
+          <div class="checkbox-group">
+            <input type="checkbox" id="morning">
+            <label for="morning">Morning</label>
+            <input type="checkbox" id="afternoon">
+            <label for="afternoon">Afternoon</label>
+            <input type="checkbox" id="evening">
+            <label for="evening">Evening</label>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="onboarding-actions">
+    <button 
+      class="btn-secondary" 
+      *ngIf="currentStep > 1"
+      (click)="previousStep()">
+      Previous
+    </button>
+    <button 
+      class="btn-primary" 
+      *ngIf="currentStep < totalSteps"
+      (click)="nextStep()">
+      Next
+    </button>
+    <button 
+      class="btn-primary" 
+      *ngIf="currentStep === totalSteps"
+      routerLink="/dashboard">
+      Get Started
+    </button>
+  </div>
+</div>

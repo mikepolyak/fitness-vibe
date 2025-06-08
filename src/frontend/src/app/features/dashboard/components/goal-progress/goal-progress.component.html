@@ -1,0 +1,25 @@
+<div class="goals-container">
+  <div *ngFor="let goal of goals" class="goal-card">
+    <div class="goal-header">
+      <h3>{{goal.name}}</h3>
+      <span class="due-date">Due: {{goal.dueDate | date:'mediumDate'}}</span>
+    </div>
+    
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress" 
+             [style.width.%]="getProgressPercentage(goal)"
+             [class.almost-complete]="getProgressPercentage(goal) >= 90"
+             [class.on-track]="getProgressPercentage(goal) >= 60 && getProgressPercentage(goal) < 90"
+             [class.needs-work]="getProgressPercentage(goal) < 60">
+        </div>
+      </div>
+      
+      <div class="progress-stats">
+        <span class="current">{{goal.current}}</span>
+        <span class="separator">/</span>
+        <span class="target">{{goal.target}} {{goal.unit}}</span>
+      </div>
+    </div>
+  </div>
+</div>

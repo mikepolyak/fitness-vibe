@@ -1,0 +1,170 @@
+<div class="social-container">
+  <!-- Social Navigation -->
+  <nav class="social-nav">
+    <div 
+      class="nav-item" 
+      [class.active]="activeTab === 'feed'"
+      (click)="setActiveTab('feed')">
+      <i class="material-icons">dynamic_feed</i>
+      Activity Feed
+    </div>
+    <div 
+      class="nav-item" 
+      [class.active]="activeTab === 'friends'"
+      (click)="setActiveTab('friends')">
+      <i class="material-icons">people</i>
+      Friends
+    </div>
+    <div 
+      class="nav-item" 
+      [class.active]="activeTab === 'challenges'"
+      (click)="setActiveTab('challenges')">
+      <i class="material-icons">emoji_events</i>
+      Challenges
+    </div>
+    <div 
+      class="nav-item" 
+      [class.active]="activeTab === 'groups'"
+      (click)="setActiveTab('groups')">
+      <i class="material-icons">groups</i>
+      Groups
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <div class="social-content">
+    <!-- Activity Feed -->
+    <div *ngIf="activeTab === 'feed'" class="feed-container">
+      <div class="main-content">
+        <!-- Create Post -->
+        <div class="create-post">
+          <div class="post-input">
+            <img src="assets/images/avatars/user.jpg" alt="Your Avatar" class="user-avatar">
+            <input type="text" placeholder="Share your fitness journey...">
+          </div>
+          <div class="post-actions">
+            <button class="action-btn">
+              <i class="material-icons">image</i>
+              Photo
+            </button>
+            <button class="action-btn">
+              <i class="material-icons">videocam</i>
+              Video
+            </button>
+            <button class="action-btn">
+              <i class="material-icons">emoji_events</i>
+              Achievement
+            </button>
+            <button class="post-btn">Post</button>
+          </div>
+        </div>
+
+        <!-- Posts List -->
+        <div class="posts-list">
+          <div *ngFor="let post of posts" class="post-card">
+            <div class="post-header">
+              <img [src]="post.user.avatar" [alt]="post.user.name" class="user-avatar">
+              <div class="post-info">
+                <h3>{{ post.user.name }}</h3>
+                <span class="timestamp">{{ post.timestamp | date:'shortTime' }}</span>
+              </div>
+            </div>
+
+            <div class="post-content">
+              <p>{{ post.content }}</p>
+              <div *ngIf="post.media && post.media.length > 0" class="post-media">
+                <img *ngFor="let media of post.media" [src]="media" alt="Post media">
+              </div>
+            </div>
+
+            <div class="post-actions">
+              <button class="action-btn" (click)="likePost(post)">
+                <i class="material-icons">favorite_border</i>
+                {{ post.likes }}
+              </button>
+              <button class="action-btn" (click)="commentOnPost(post)">
+                <i class="material-icons">chat_bubble_outline</i>
+                {{ post.comments }}
+              </button>
+              <button class="action-btn" (click)="sharePost(post)">
+                <i class="material-icons">share</i>
+                Share
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-content">
+        <!-- Friend Suggestions -->
+        <div class="suggestions-card">
+          <h2>Suggested Friends</h2>
+          <div class="suggestions-list">
+            <div *ngFor="let friend of suggestedFriends" class="suggestion-item">
+              <img [src]="friend.avatar" [alt]="friend.name" class="user-avatar">
+              <div class="suggestion-info">
+                <h3>{{ friend.name }}</h3>
+                <p>{{ friend.mutualFriends }} mutual friends</p>
+              </div>
+              <button class="add-btn" (click)="addFriend(friend.id)">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Groups -->
+        <div class="groups-card">
+          <h2>Active Groups</h2>
+          <div class="groups-list">
+            <div *ngFor="let group of activeGroups" class="group-item">
+              <img [src]="group.image" [alt]="group.name" class="group-image">
+              <div class="group-info">
+                <h3>{{ group.name }}</h3>
+                <p>{{ group.members }} members</p>
+              </div>
+              <button class="join-btn" (click)="joinGroup(group.id)">Join</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Friends Tab -->
+    <div *ngIf="activeTab === 'friends'" class="friends-container">
+      <div class="friends-list">
+        <div *ngFor="let friend of friends" class="friend-card">
+          <div class="friend-header">
+            <img [src]="friend.avatar" [alt]="friend.name" class="friend-avatar">
+            <div [class.online]="friend.isOnline" class="status-indicator"></div>
+          </div>
+          <div class="friend-info">
+            <h3>{{ friend.name }}</h3>
+            <p class="level">Level {{ friend.level }}</p>
+            <p class="status">
+              {{ friend.isOnline ? 'Online' : 'Last seen ' + (friend.lastActive | date:'shortTime') }}
+            </p>
+          </div>
+          <div class="friend-actions">
+            <button class="action-btn">
+              <i class="material-icons">chat</i>
+            </button>
+            <button class="action-btn">
+              <i class="material-icons">person_add</i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenges Tab -->
+    <div *ngIf="activeTab === 'challenges'" class="challenges-container">
+      <h2>Coming Soon: Fitness Challenges</h2>
+      <p>Join group challenges and compete with friends!</p>
+    </div>
+
+    <!-- Groups Tab -->
+    <div *ngIf="activeTab === 'groups'" class="groups-container">
+      <h2>Coming Soon: Fitness Groups</h2>
+      <p>Connect with like-minded fitness enthusiasts!</p>
+    </div>
+  </div>
+</div>

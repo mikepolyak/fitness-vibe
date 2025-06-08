@@ -1,0 +1,12 @@
+<div class="badges-container">
+  <div *ngFor="let badge of recentBadges" class="badge-card" [class]="badge.rarity">
+    <div class="badge-icon">
+      <i [class]="badge.iconClass"></i>
+    </div>
+    <div class="badge-info">
+      <h4>{{badge.name}}</h4>
+      <p>{{badge.description}}</p>
+      <span class="earned-date">Earned {{badge.earned | date:'mediumDate'}}</span>
+    </div>
+  </div>
+</div>

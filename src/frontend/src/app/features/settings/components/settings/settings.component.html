@@ -1,0 +1,247 @@
+<div class="settings-container">
+  <div class="settings-sidebar">
+    <h2>Settings</h2>
+    <nav class="settings-nav">
+      <div 
+        *ngFor="let section of sections"
+        class="nav-item"
+        [class.active]="isSectionActive(section.id)"
+        (click)="setActiveSection(section.id)">
+        <i class="material-icons">{{ section.icon }}</i>
+        {{ section.label }}
+      </div>
+    </nav>
+  </div>
+
+  <div class="settings-content">
+    <div [ngSwitch]="activeSection">
+      <!-- Account Settings -->
+      <div *ngSwitchCase="'account'" class="settings-section">
+        <h1>Account Settings</h1>
+        <div class="settings-form">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" [(ngModel)]="settings.account.email">
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" [(ngModel)]="settings.account.phone">
+          </div>
+          <div class="form-group">
+            <label>Language</label>
+            <select [(ngModel)]="settings.account.language">
+              <option value="English">English</option>
+              <option value="Spanish">Spanish</option>
+              <option value="French">French</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Time Zone</label>
+            <select [(ngModel)]="settings.account.timezone">
+              <option value="UTC-5">Eastern Time (UTC-5)</option>
+              <option value="UTC-6">Central Time (UTC-6)</option>
+              <option value="UTC-7">Mountain Time (UTC-7)</option>
+              <option value="UTC-8">Pacific Time (UTC-8)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preferences -->
+      <div *ngSwitchCase="'preferences'" class="settings-section">
+        <h1>Preferences</h1>
+        <div class="settings-form">
+          <div class="form-group">
+            <label>Measurement Unit</label>
+            <select [(ngModel)]="settings.preferences.measurementUnit">
+              <option value="Metric">Metric (kg, km)</option>
+              <option value="Imperial">Imperial (lb, mi)</option>
+            </select>
+          </div>
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="settings.preferences.workoutReminders">
+              Enable Workout Reminders
+            </label>
+          </div>
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="settings.preferences.weeklyReports">
+              Receive Weekly Progress Reports
+            </label>
+          </div>
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="settings.preferences.challengeInvites">
+              Allow Challenge Invites
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div *ngSwitchCase="'notifications'" class="settings-section">
+        <h1>Notifications</h1>
+        <div class="settings-form">
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="settings.notifications.email">
+              Email Notifications
+            </label>
+          </div>
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="settings.notifications.push">
+              Push Notifications
+            </label>
+          </div>
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="settings.notifications.achievements">
+              Achievement Alerts
+            </label>
+          </div>
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="settings.notifications.friendActivity">
+              Friend Activity Updates
+            </label>
+          </div>
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="settings.notifications.challenges">
+              Challenge Notifications
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Privacy & Security -->
+      <div *ngSwitchCase="'privacy'" class="settings-section">
+        <h1>Privacy & Security</h1>
+        <div class="settings-form">
+          <div class="form-group">
+            <label>Profile Visibility</label>
+            <select [(ngModel)]="settings.privacy.profileVisibility">
+              <option value="Public">Public</option>
+              <option value="Friends">Friends Only</option>
+              <option value="Private">Private</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Activity Sharing</label>
+            <select [(ngModel)]="settings.privacy.activitySharing">
+              <option value="Public">Public</option>
+              <option value="Friends">Friends Only</option>
+              <option value="Private">Private</option>
+            </select>
+          </div>
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="settings.privacy.showStats">
+              Show Statistics on Profile
+            </label>
+          </div>
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="settings.privacy.allowTagging">
+              Allow Friends to Tag You
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appearance -->
+      <div *ngSwitchCase="'appearance'" class="settings-section">
+        <h1>Appearance</h1>
+        <div class="settings-form">
+          <div class="form-group">
+            <label>Theme</label>
+            <select [(ngModel)]="settings.appearance.theme">
+              <option value="Light">Light</option>
+              <option value="Dark">Dark</option>
+              <option value="System">System Default</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Color Scheme</label>
+            <select [(ngModel)]="settings.appearance.colorScheme">
+              <option value="Default">Default</option>
+              <option value="Forest">Forest</option>
+              <option value="Ocean">Ocean</option>
+              <option value="Sunset">Sunset</option>
+            </select>
+          </div>
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="settings.appearance.compactMode">
+              Enable Compact Mode
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Integrations -->
+      <div *ngSwitchCase="'integrations'" class="settings-section">
+        <h1>Integrations</h1>
+        <div class="settings-form">
+          <div class="integration-item">
+            <div class="integration-info">
+              <img src="assets/images/google-fit.png" alt="Google Fit">
+              <div>
+                <h3>Google Fit</h3>
+                <p>Sync your activities with Google Fit</p>
+              </div>
+            </div>
+            <button class="connect-btn" [class.connected]="settings.integrations.googleFit">
+              {{ settings.integrations.googleFit ? 'Connected' : 'Connect' }}
+            </button>
+          </div>
+
+          <div class="integration-item">
+            <div class="integration-info">
+              <img src="assets/images/apple-health.png" alt="Apple Health">
+              <div>
+                <h3>Apple Health</h3>
+                <p>Sync your activities with Apple Health</p>
+              </div>
+            </div>
+            <button class="connect-btn" [class.connected]="settings.integrations.appleHealth">
+              {{ settings.integrations.appleHealth ? 'Connected' : 'Connect' }}
+            </button>
+          </div>
+
+          <div class="integration-item">
+            <div class="integration-info">
+              <img src="assets/images/strava.png" alt="Strava">
+              <div>
+                <h3>Strava</h3>
+                <p>Connect and share activities with Strava</p>
+              </div>
+            </div>
+            <button class="connect-btn" [class.connected]="settings.integrations.strava">
+              {{ settings.integrations.strava ? 'Connected' : 'Connect' }}
+            </button>
+          </div>
+
+          <div class="integration-item">
+            <div class="integration-info">
+              <img src="assets/images/fitbit.png" alt="Fitbit">
+              <div>
+                <h3>Fitbit</h3>
+                <p>Sync your Fitbit data</p>
+              </div>
+            </div>
+            <button class="connect-btn" [class.connected]="settings.integrations.fitbit">
+              {{ settings.integrations.fitbit ? 'Connected' : 'Connect' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-actions">
+      <button class="save-btn" (click)="saveSettings()">Save Changes</button>
+    </div>
+  </div>
+</div>
