@@ -9,7 +9,14 @@ namespace FitnessVibe.Domain.Common
     /// </summary>
     public interface IDomainEvent
     {
+        /// <summary>
+        /// Gets the unique identifier for this event instance
+        /// </summary>
         public Guid Id { get; }
+
+        /// <summary>
+        /// Gets the UTC timestamp when this event occurred
+        /// </summary>
         public DateTime OccurredOn { get; }
     }
 }

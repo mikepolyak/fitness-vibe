@@ -20,12 +20,12 @@ namespace FitnessVibe.Domain.Entities.Users
         /// <summary>
         /// Navigation property to the user who created this goal
         /// </summary>
-        public required User User { get; private set; }
+        public virtual User User { get; private set; } = null!;
 
         /// <summary>
         /// The title or name of the goal
         /// </summary>
-        public required string Title { get; private set; }
+        public string Title { get; private set; } = string.Empty;
 
         /// <summary>
         /// Optional detailed description of the goal
@@ -55,7 +55,7 @@ namespace FitnessVibe.Domain.Entities.Users
         /// <summary>
         /// The unit of measurement (e.g., "steps", "minutes", "kilometers")
         /// </summary>
-        public required string Unit { get; private set; }
+        public string Unit { get; private set; } = string.Empty;
 
         /// <summary>
         /// When the goal becomes active
@@ -77,12 +77,25 @@ namespace FitnessVibe.Domain.Entities.Users
         /// </summary>
         public bool IsAdaptive { get; private set; }
 
-        // For EF Core
+        /// <summary>
+        /// Protected constructor for EF Core
+        /// </summary>
         protected UserGoal() { }
 
         /// <summary>
         /// Creates a new user goal
         /// </summary>
+        /// <param name="user">The user creating the goal</param>
+        /// <param name="title">Title of the goal</param>
+        /// <param name="type">Type of goal (Distance, Duration, etc.)</param>
+        /// <param name="frequency">How often the goal is evaluated</param>
+        /// <param name="targetValue">The target value to achieve</param>
+        /// <param name="unit">Unit of measurement</param>
+        /// <param name="startDate">When the goal becomes active</param>
+        /// <param name="endDate">When the goal should be completed by</param>
+        /// <param name="description">Optional detailed description</param>
+        /// <param name="isAdaptive">Whether the goal adjusts based on performance</param>
+        /// <returns>A new UserGoal instance</returns>
         public static UserGoal Create(
             User user,
             string title,
@@ -97,21 +110,23 @@ namespace FitnessVibe.Domain.Entities.Users
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
+
             if (string.IsNullOrWhiteSpace(title))
-                throw new ArgumentException("Title cannot be empty", nameof(title));
+                throw new ArgumentException("Goal title cannot be empty", nameof(title));
+
             if (string.IsNullOrWhiteSpace(unit))
-                throw new ArgumentException("Unit cannot be empty", nameof(unit));
+                throw new ArgumentException("Goal unit cannot be empty", nameof(unit));
+
             if (targetValue <= 0)
                 throw new ArgumentException("Target value must be greater than zero", nameof(targetValue));
-            if (startDate >= endDate)
-                throw new ArgumentException("End date must be after start date");
-            if (startDate < DateTime.UtcNow.Date)
-                throw new ArgumentException("Start date cannot be in the past");
+
+            if (endDate <= startDate)
+                throw new ArgumentException("End date must be after start date", nameof(endDate));
 
             var goal = new UserGoal
             {
-                User = user,
                 UserId = user.Id,
+                User = user,
                 Title = title,
                 Description = description,
                 Type = type,
@@ -119,9 +134,9 @@ namespace FitnessVibe.Domain.Entities.Users
                 TargetValue = targetValue,
                 CurrentValue = 0,
                 Unit = unit,
-                StartDate = startDate.Date,
-                EndDate = endDate.Date,
-                Status = GoalStatus.Pending,
+                StartDate = startDate,
+                EndDate = endDate,
+                Status = GoalStatus.Active,
                 IsAdaptive = isAdaptive
             };
 
@@ -129,129 +144,79 @@ namespace FitnessVibe.Domain.Entities.Users
         }
 
         /// <summary>
-        /// Updates the goal's target value
+        /// Updates progress towards the goal's target
         /// </summary>
-        public void UpdateTarget(decimal newTargetValue)
+        /// <param name="value">The value to add to current progress</param>
+        public void UpdateProgress(decimal value)
         {
-            if (newTargetValue <= 0)
-                throw new ArgumentException("Target value must be greater than zero");
+            if (Status != GoalStatus.Active)
+                return;
 
-            if (Status == GoalStatus.Completed || Status == GoalStatus.Failed || Status == GoalStatus.Abandoned)
-                throw new InvalidOperationException("Cannot update target of a completed, failed, or abandoned goal");
-
-            TargetValue = newTargetValue;
+            CurrentValue += value;
             MarkAsUpdated();
+
+            if (CurrentValue >= TargetValue)
+            {
+                CompleteGoal();
+            }
+        }
+
+        /// <summary>
+        /// Marks the goal as completed and raises appropriate events
+        /// </summary>
+        public void CompleteGoal()
+        {
+            if (Status == GoalStatus.Completed)
+                return;
+
+            Status = GoalStatus.Completed;
+            MarkAsUpdated();
+            AddDomainEvent(new GoalCompletedEvent(this));
+        }
+
+        /// <summary>
+        /// Marks the goal as failed if it's past the end date and not completed
+        /// </summary>
+        public void CheckFailure()
+        {
+            if (Status == GoalStatus.Failed || Status == GoalStatus.Completed)
+                return;
+
+            if (DateTime.UtcNow > EndDate && CurrentValue < TargetValue)
+            {
+                Status = GoalStatus.Failed;
+                MarkAsUpdated();
+                AddDomainEvent(new GoalFailedEvent(this));
+            }
         }
 
         /// <summary>
         /// Updates the goal's end date
         /// </summary>
+        /// <param name="newEndDate">The new end date for the goal</param>
         public void ExtendDeadline(DateTime newEndDate)
         {
-            if (newEndDate <= DateTime.UtcNow.Date)
-                throw new ArgumentException("New end date must be in the future");
-            if (Status == GoalStatus.Completed || Status == GoalStatus.Failed || Status == GoalStatus.Abandoned)
-                throw new InvalidOperationException("Cannot extend deadline of a completed, failed, or abandoned goal");
+            if (Status != GoalStatus.Active)
+                return;
 
-            EndDate = newEndDate.Date;
+            if (newEndDate <= EndDate)
+                throw new ArgumentException("New end date must be later than current end date", nameof(newEndDate));
+
+            EndDate = newEndDate;
             MarkAsUpdated();
         }
 
         /// <summary>
-        /// Records progress towards the goal's target
+        /// Abandons the goal, marking it as inactive and raising appropriate events
         /// </summary>
-        public void RecordProgress(decimal progressValue)
-        {
-            if (progressValue <= 0)
-                throw new ArgumentException("Progress must be greater than zero");
-            if (Status != GoalStatus.Active && Status != GoalStatus.Pending)
-                throw new InvalidOperationException("Cannot record progress for inactive goal");
-
-            if (Status == GoalStatus.Pending)
-                Status = GoalStatus.Active;
-
-            CurrentValue += progressValue;
-            MarkAsUpdated();
-
-            if (CurrentValue >= TargetValue)
-            {
-                Status = GoalStatus.Completed;
-                MarkAsUpdated();
-                AddDomainEvent(new GoalCompletedEvent(this));
-            }
-        }
-
-        /// <summary>
-        /// Sets a new value for the current progress
-        /// </summary>
-        public void SetProgress(decimal newValue)
-        {
-            if (newValue < 0)
-                throw new ArgumentException("Progress cannot be negative");
-            if (Status != GoalStatus.Active && Status != GoalStatus.Pending)
-                throw new InvalidOperationException("Cannot set progress for inactive goal");
-
-            if (Status == GoalStatus.Pending)
-                Status = GoalStatus.Active;
-
-            CurrentValue = newValue;
-            MarkAsUpdated();
-
-            if (CurrentValue >= TargetValue)
-            {
-                Status = GoalStatus.Completed;
-                MarkAsUpdated();
-                AddDomainEvent(new GoalCompletedEvent(this));
-            }
-        }
-
-        /// <summary>
-        /// Pauses progress tracking for this goal
-        /// </summary>
-        public void Pause()
+        public void AbandonGoal()
         {
             if (Status != GoalStatus.Active)
-                throw new InvalidOperationException("Can only pause active goals");
-
-            Status = GoalStatus.Paused;
-            MarkAsUpdated();
-        }
-
-        /// <summary>
-        /// Resumes progress tracking for this goal
-        /// </summary>
-        public void Resume()
-        {
-            if (Status != GoalStatus.Paused)
-                throw new InvalidOperationException("Can only resume paused goals");
-
-            Status = GoalStatus.Active;
-            MarkAsUpdated();
-        }
-
-        /// <summary>
-        /// Abandons the goal
-        /// </summary>
-        public void Abandon()
-        {
-            if (Status == GoalStatus.Completed || Status == GoalStatus.Failed || Status == GoalStatus.Abandoned)
-                throw new InvalidOperationException("Goal is already in a final state");
+                return;
 
             Status = GoalStatus.Abandoned;
             MarkAsUpdated();
             AddDomainEvent(new GoalAbandonedEvent(this));
-        }
-
-        /// <summary>
-        /// Checks if the goal is overdue based on the current date
-        /// </summary>
-        public void CheckOverdue()
-        {
-            if (Status == GoalStatus.Active && DateTime.UtcNow.Date > EndDate)
-            {
-                Status = GoalStatus.Failed;
-                MarkAsUpdated();
-            }
         }
     }
 }
