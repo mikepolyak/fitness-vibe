@@ -1,0 +1,144 @@
+<!-- Login Form - Your gateway back to your fitness adventure -->
+<div class="login-container">
+
+  <!-- Welcome Back Header -->
+  <div class="login-header">
+    <h2 class="welcome-title">Welcome Back, Athlete!</h2>
+    <p class="welcome-subtitle">
+      Ready to continue your fitness journey? Let's pick up where you left off.
+    </p>
+  </div>
+
+  <!-- Login Form -->
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+    
+    <!-- Email Field -->
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Email Address</mat-label>
+      <input 
+        matInput 
+        type="email" 
+        formControlName="email"
+        placeholder="your.email@example.com"
+        autocomplete="email">
+      <mat-icon matSuffix>email</mat-icon>
+      <mat-error *ngIf="shouldShowFieldError('email')">
+        {{ getFieldError('email') }}
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Password Field -->
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Password</mat-label>
+      <input 
+        matInput 
+        [type]="hidePassword ? 'password' : 'text'"
+        formControlName="password"
+        placeholder="Enter your password"
+        autocomplete="current-password">
+      <button 
+        mat-icon-button 
+        matSuffix 
+        type="button"
+        (click)="togglePasswordVisibility()"
+        [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="hidePassword">
+        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="shouldShowFieldError('password')">
+        {{ getFieldError('password') }}
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Remember Me & Forgot Password -->
+    <div class="form-options">
+      <mat-checkbox formControlName="rememberMe" class="remember-me">
+        Keep me signed in
+      </mat-checkbox>
+      
+      <button 
+        type="button" 
+        mat-button 
+        color="primary" 
+        class="forgot-password-btn"
+        (click)="navigateToPasswordReset()">
+        Forgot Password?
+      </button>
+    </div>
+
+    <!-- Error Display -->
+    <div class="error-container" *ngIf="error$ | async as error">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <span class="error-message">{{ error }}</span>
+    </div>
+
+    <!-- Submit Button -->
+    <button 
+      mat-raised-button 
+      color="primary" 
+      type="submit"
+      class="login-btn"
+      [disabled]="(isLoggingIn$ | async) || loginForm.invalid">
+      
+      <span *ngIf="!(isLoggingIn$ | async)">Sign In</span>
+      
+      <span *ngIf="isLoggingIn$ | async" class="loading-content">
+        <mat-spinner diameter="20" class="inline-spinner"></mat-spinner>
+        Signing you in...
+      </span>
+    </button>
+
+    <!-- Demo Login (Development only) -->
+    <button 
+      mat-stroked-button 
+      type="button"
+      class="demo-btn"
+      (click)="loginAsDemo()"
+      *ngIf="false"> <!-- Set to true for development -->
+      
+      <mat-icon>play_circle_outline</mat-icon>
+      Try Demo Account
+    </button>
+
+  </form>
+
+  <!-- Social Login Options (Future feature) -->
+  <!-- 
+  <div class="social-login-section">
+    <div class="divider">
+      <span>or continue with</span>
+    </div>
+    
+    <div class="social-buttons">
+      <button mat-stroked-button class="social-btn google-btn">
+        <img src="assets/icons/google.svg" alt="Google">
+        Google
+      </button>
+      
+      <button mat-stroked-button class="social-btn apple-btn">
+        <img src="assets/icons/apple.svg" alt="Apple">
+        Apple
+      </button>
+    </div>
+  </div>
+  -->
+
+  <!-- Sign Up Link -->
+  <div class="signup-prompt">
+    <p class="signup-text">
+      New to FitnessVibe? 
+      <button 
+        mat-button 
+        color="primary" 
+        class="signup-link"
+        (click)="navigateToRegister()">
+        Create your account
+      </button>
+    </p>
+    
+    <p class="motivation-text">
+      Join thousands of fitness enthusiasts who've turned their workouts into adventures!
+    </p>
+  </div>
+
+</div>

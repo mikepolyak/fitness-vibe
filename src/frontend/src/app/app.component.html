@@ -1,0 +1,49 @@
+<!-- Main Application Shell -->
+<div class="app-container" [class.authenticated]="isAuthenticated$ | async">
+  
+  <!-- Loading Splash Screen -->
+  <fv-loading-screen *ngIf="!(isAuthenticated$ | async) && !currentUser$"></fv-loading-screen>
+
+  <!-- Authenticated User Experience -->
+  <ng-container *ngIf="isAuthenticated$ | async">
+    
+    <!-- Top Navigation Bar -->
+    <fv-header 
+      [currentUser]="currentUser$ | async"
+      class="app-header">
+    </fv-header>
+
+    <!-- Main Content Area -->
+    <main class="app-main" role="main">
+      <!-- Router Outlet - where different pages/features are displayed -->
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <fv-bottom-nav class="app-bottom-nav" *ngIf="isMobile$ | async"></fv-bottom-nav>
+
+    <!-- Floating Action Button for Quick Activity Logging -->
+    <fv-quick-action-fab class="app-fab"></fv-quick-action-fab>
+
+  </ng-container>
+
+  <!-- Unauthenticated User Experience -->
+  <ng-container *ngIf="!(isAuthenticated$ | async)">
+    
+    <!-- Welcome/Login Area -->
+    <div class="welcome-container">
+      <router-outlet></router-outlet>
+    </div>
+
+  </ng-container>
+
+  <!-- Global Notifications -->
+  <fv-notification-center class="app-notifications"></fv-notification-center>
+
+  <!-- Achievement Popup Overlay -->
+  <fv-achievement-popup class="app-achievement-popup"></fv-achievement-popup>
+
+</div>
+
+<!-- PWA Update Available Banner -->
+<fv-pwa-update-banner *ngIf="updateAvailable$ | async"></fv-pwa-update-banner>

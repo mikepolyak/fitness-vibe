@@ -1,0 +1,71 @@
+<!-- Progress Bar Container -->
+<div [class]="progressBarClasses" [attr.aria-label]="label || 'Progress'" role="progressbar" 
+     [attr.aria-valuenow]="value" [attr.aria-valuemin]="min" [attr.aria-valuemax]="max">
+  
+  <!-- Label (Top Position) -->
+  <div *ngIf="label && labelPosition === 'top'" class="progress-bar__label progress-bar__label--top">
+    {{ label }}
+  </div>
+  
+  <!-- Progress Track Container -->
+  <div class="progress-bar__container">
+    
+    <!-- Progress Track -->
+    <div class="progress-bar__track">
+      
+      <!-- Progress Fill -->
+      <div 
+        class="progress-bar__fill"
+        [style.width.%]="indeterminate ? 100 : progressPercentage"
+        [attr.data-progress]="progressPercentage">
+      </div>
+      
+      <!-- Milestone Markers -->
+      <div *ngIf="showMilestones" class="progress-bar__milestones">
+        <div 
+          *ngFor="let milestone of milestonePositions"
+          class="progress-bar__milestone"
+          [class.progress-bar__milestone--reached]="milestone.reached"
+          [style.left.%]="milestone.position"
+          [attr.title]="milestone.value + (valueSuffix ? ' ' + valueSuffix : '')"
+          matTooltip="{{ milestone.value }}{{ valueSuffix ? ' ' + valueSuffix : '' }}">
+        </div>
+      </div>
+      
+      <!-- Inline Label/Percentage -->
+      <div *ngIf="labelPosition === 'inline' && (label || showPercentage)" 
+           class="progress-bar__inline-text">
+        <span *ngIf="label" class="progress-bar__inline-label">{{ label }}</span>
+        <span *ngIf="showPercentage" class="progress-bar__inline-percentage">{{ percentageText }}</span>
+      </div>
+      
+    </div>
+    
+    <!-- Values/Percentage Display (Outside) -->
+    <div *ngIf="showValues || (showPercentage && labelPosition !== 'inline')" 
+         class="progress-bar__values">
+      <span *ngIf="showValues" class="progress-bar__values-text">{{ valuesText }}</span>
+      <span *ngIf="showPercentage && labelPosition !== 'inline'" 
+            class="progress-bar__percentage">{{ percentageText }}</span>
+    </div>
+    
+  </div>
+  
+  <!-- Label (Bottom Position) -->
+  <div *ngIf="label && labelPosition === 'bottom'" class="progress-bar__label progress-bar__label--bottom">
+    {{ label }}
+  </div>
+  
+  <!-- Motivational Message (when completed) -->
+  <div *ngIf="isCompleted" class="progress-bar__completion-message">
+    <mat-icon class="progress-bar__completion-icon">check_circle</mat-icon>
+    <span class="progress-bar__completion-text">Goal Complete!</span>
+  </div>
+  
+  <!-- Progress Status Text (for screen readers) -->
+  <span class="sr-only">
+    {{ label || 'Progress' }}: {{ value }} of {{ max }}{{ valueSuffix ? ' ' + valueSuffix : '' }}, 
+    {{ Math.round(progressPercentage) }} percent complete
+  </span>
+  
+</div>

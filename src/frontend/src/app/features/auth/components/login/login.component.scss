@@ -1,0 +1,307 @@
+// Login Component Styles - Clean, welcoming, and professional
+
+.login-container {
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+// Header Section
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  .welcome-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.02em;
+  }
+
+  .welcome-subtitle {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+// Form Styles
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  .form-field {
+    width: 100%;
+
+    ::ng-deep {
+      .mat-mdc-form-field-outline {
+        border-radius: 8px;
+      }
+
+      .mat-mdc-form-field-focus-overlay {
+        border-radius: 8px;
+      }
+    }
+  }
+}
+
+// Form Options Row
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: -0.5rem 0 0.5rem 0;
+
+  .remember-me {
+    ::ng-deep .mat-mdc-checkbox-label {
+      font-size: 0.875rem;
+      color: #666;
+    }
+  }
+
+  .forgot-password-btn {
+    font-size: 0.875rem;
+    padding: 0;
+    min-width: auto;
+    
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+
+// Error Display
+.error-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  margin-top: -0.5rem;
+
+  .error-icon {
+    color: #f44336;
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .error-message {
+    font-size: 0.875rem;
+    color: #d32f2f;
+    flex: 1;
+  }
+}
+
+// Login Button
+.login-btn {
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+
+  .loading-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .inline-spinner {
+      ::ng-deep circle {
+        stroke: currentColor;
+      }
+    }
+  }
+}
+
+// Demo Button (Development)
+.demo-btn {
+  height: 40px;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  
+  mat-icon {
+    margin-right: 0.5rem;
+  }
+}
+
+// Social Login Section (Future feature)
+.social-login-section {
+  margin: 2rem 0;
+
+  .divider {
+    position: relative;
+    text-align: center;
+    margin: 1.5rem 0;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #e0e0e0;
+      z-index: 1;
+    }
+
+    span {
+      background: white;
+      padding: 0 1rem;
+      font-size: 0.875rem;
+      color: #999;
+      position: relative;
+      z-index: 2;
+    }
+  }
+
+  .social-buttons {
+    display: flex;
+    gap: 1rem;
+
+    .social-btn {
+      flex: 1;
+      height: 44px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-weight: 500;
+
+      img {
+        width: 20px;
+        height: 20px;
+      }
+
+      &.google-btn {
+        border-color: #db4437;
+        color: #db4437;
+
+        &:hover {
+          background-color: rgba(219, 68, 55, 0.04);
+        }
+      }
+
+      &.apple-btn {
+        border-color: #000;
+        color: #000;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.04);
+        }
+      }
+    }
+  }
+}
+
+// Sign Up Prompt
+.signup-prompt {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e0e0e0;
+
+  .signup-text {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0 0 1rem 0;
+
+    .signup-link {
+      font-weight: 600;
+      padding: 0;
+      min-width: auto;
+      
+      &:hover {
+        background: transparent;
+      }
+    }
+  }
+
+  .motivation-text {
+    font-size: 0.75rem;
+    color: #999;
+    margin: 0;
+    line-height: 1.4;
+    font-style: italic;
+  }
+}
+
+// Responsive Design
+@media (max-width: 480px) {
+  .login-container {
+    padding: 0 1rem;
+  }
+
+  .login-header {
+    .welcome-title {
+      font-size: 1.5rem;
+    }
+  }
+
+  .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+
+    .forgot-password-btn {
+      align-self: flex-end;
+    }
+  }
+
+  .social-login-section .social-buttons {
+    flex-direction: column;
+  }
+}
+
+// Animation for smooth entrance
+:host {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Focus styles for accessibility
+.login-form {
+  ::ng-deep {
+    .mat-mdc-form-field.mat-focused {
+      .mat-mdc-form-field-outline-thick {
+        border-color: #667eea;
+      }
+    }
+  }
+}
+
+// Button hover states
+.login-btn {
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+}
+
+.demo-btn {
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}

@@ -1,0 +1,24 @@
+<!-- Loading Spinner Container -->
+<div [class]="spinnerClasses" role="status" [attr.aria-label]="message || 'Loading'">
+  
+  <!-- Overlay Background (if enabled) -->
+  <div *ngIf="overlay" class="loading-spinner__overlay"></div>
+  
+  <!-- Spinner Content -->
+  <div class="loading-spinner__content">
+    
+    <!-- Material Spinner -->
+    <mat-progress-spinner
+      [diameter]="spinnerDiameter"
+      mode="indeterminate"
+      [color]="color">
+    </mat-progress-spinner>
+    
+    <!-- Loading Message -->
+    <div *ngIf="message" class="loading-spinner__message">
+      {{ message }}
+    </div>
+    
+  </div>
+  
+</div>

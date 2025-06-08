@@ -1,0 +1,93 @@
+<!-- User Avatar Container -->
+<div 
+  [class]="avatarClasses"
+  [attr.aria-label]="avatarAlt"
+  [attr.role]="clickable ? 'button' : null"
+  [attr.tabindex]="clickable ? '0' : null"
+  (click)="onAvatarClick()"
+  (keydown.enter)="onAvatarClick()"
+  (keydown.space)="onAvatarClick()">
+  
+  <!-- Avatar Image or Initials -->
+  <div class="user-avatar__image-container">
+    
+    <!-- Custom Avatar Image -->
+    <img 
+      *ngIf="hasAvatarImage" 
+      [src]="user!.avatarUrl!" 
+      [alt]="avatarAlt"
+      class="user-avatar__image"
+      (error)="onImageError()"
+      loading="lazy">
+    
+    <!-- Initials Fallback -->
+    <div 
+      *ngIf="!hasAvatarImage" 
+      class="user-avatar__initials"
+      [style.backgroundColor]="levelColor">
+      {{ initials }}
+    </div>
+    
+    <!-- Level Badge Overlay -->
+    <div 
+      *ngIf="showLevel && user?.level" 
+      class="user-avatar__level-badge"
+      [style.backgroundColor]="levelColor"
+      [attr.aria-label]="'Level ' + user.level"
+      matTooltip="Level {{ user.level }}">
+      {{ user.level }}
+    </div>
+    
+    <!-- Online Status Indicator -->
+    <div 
+      *ngIf="showOnlineStatus" 
+      class="user-avatar__status-indicator"
+      [class.user-avatar__status-indicator--online]="isOnline"
+      [class.user-avatar__status-indicator--offline]="!isOnline"
+      [attr.aria-label]="isOnline ? 'Online' : 'Offline'"
+      [matTooltip]="isOnline ? 'Online' : 'Offline'">
+    </div>
+    
+    <!-- Progress Ring (for level progress) -->
+    <svg 
+      *ngIf="showLevel && user?.level && progressToNextLevel > 0" 
+      class="user-avatar__progress-ring"
+      viewBox="0 0 36 36">
+      <!-- Background circle -->
+      <path 
+        class="user-avatar__progress-ring-bg"
+        d="M18 2.0845
+           a 15.9155 15.9155 0 0 1 0 31.831
+           a 15.9155 15.9155 0 0 1 0 -31.831"
+        fill="none"
+        stroke="rgba(255, 255, 255, 0.2)"
+        stroke-width="2">
+      </path>
+      <!-- Progress circle -->
+      <path 
+        class="user-avatar__progress-ring-progress"
+        [style.stroke-dasharray]="progressToNextLevel + ', 100'"
+        d="M18 2.0845
+           a 15.9155 15.9155 0 0 1 0 31.831
+           a 15.9155 15.9155 0 0 1 0 -31.831"
+        fill="none"
+        [attr.stroke]="levelColor"
+        stroke-width="2"
+        stroke-linecap="round">
+      </path>
+    </svg>
+    
+  </div>
+  
+  <!-- Hover Tooltip Content -->
+  <div *ngIf="clickable" class="user-avatar__tooltip-content" hidden>
+    <div class="user-avatar__tooltip-name">{{ displayName }}</div>
+    <div *ngIf="user?.level" class="user-avatar__tooltip-level">
+      Level {{ user.level }} • {{ user.experiencePoints | number }} XP
+    </div>
+    <div *ngIf="user?.fitnessLevel" class="user-avatar__tooltip-fitness">
+      {{ user.fitnessLevel }} • {{ user.primaryGoal }}
+    </div>
+  </div>
+  
+</div>

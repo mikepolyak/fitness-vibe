@@ -1,0 +1,234 @@
+<!-- Registration Form - Start your fitness adventure -->
+<div class="register-container">
+
+  <!-- Welcome Header -->
+  <div class="register-header">
+    <h2 class="welcome-title">Welcome to FitnessVibe!</h2>
+    <p class="welcome-subtitle">
+      Ready to turn your fitness routine into an exciting adventure? Let's set up your profile.
+    </p>
+  </div>
+
+  <!-- Registration Form -->
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+    
+    <!-- Personal Information Section -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>person</mat-icon>
+        Personal Information
+      </h3>
+      
+      <div class="name-row">
+        <!-- First Name -->
+        <mat-form-field appearance="outline" class="form-field half-width">
+          <mat-label>First Name</mat-label>
+          <input 
+            matInput 
+            type="text" 
+            formControlName="firstName"
+            placeholder="John"
+            autocomplete="given-name">
+          <mat-error *ngIf="shouldShowFieldError('firstName')">
+            {{ getFieldError('firstName') }}
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Last Name -->
+        <mat-form-field appearance="outline" class="form-field half-width">
+          <mat-label>Last Name</mat-label>
+          <input 
+            matInput 
+            type="text" 
+            formControlName="lastName"
+            placeholder="Doe"
+            autocomplete="family-name">
+          <mat-error *ngIf="shouldShowFieldError('lastName')">
+            {{ getFieldError('lastName') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Email -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Email Address</mat-label>
+        <input 
+          matInput 
+          type="email" 
+          formControlName="email"
+          placeholder="john.doe@example.com"
+          autocomplete="email">
+        <mat-icon matSuffix>email</mat-icon>
+        <mat-error *ngIf="shouldShowFieldError('email')">
+          {{ getFieldError('email') }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Security Section -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>security</mat-icon>
+        Account Security
+      </h3>
+      
+      <!-- Password -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Password</mat-label>
+        <input 
+          matInput 
+          [type]="hidePassword ? 'password' : 'text'"
+          formControlName="password"
+          placeholder="Create a strong password"
+          autocomplete="new-password">
+        <button 
+          mat-icon-button 
+          matSuffix 
+          type="button"
+          (click)="togglePasswordVisibility()"
+          [attr.aria-label]="'Hide password'"
+          [attr.aria-pressed]="hidePassword">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="shouldShowFieldError('password')">
+          {{ getFieldError('password') }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Password Strength Indicator -->
+      <div class="password-strength" *ngIf="registerForm.get('password')?.value">
+        <div class="strength-meter">
+          <div class="strength-bar" [ngClass]="getPasswordStrengthClass()"></div>
+        </div>
+        <span class="strength-text">Password strength: {{ getPasswordStrengthClass().replace('strength-', '') }}</span>
+      </div>
+
+      <!-- Confirm Password -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Confirm Password</mat-label>
+        <input 
+          matInput 
+          [type]="hideConfirmPassword ? 'password' : 'text'"
+          formControlName="confirmPassword"
+          placeholder="Confirm your password"
+          autocomplete="new-password">
+        <button 
+          mat-icon-button 
+          matSuffix 
+          type="button"
+          (click)="toggleConfirmPasswordVisibility()"
+          [attr.aria-label]="'Hide password'"
+          [attr.aria-pressed]="hideConfirmPassword">
+          <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="shouldShowFieldError('confirmPassword') || shouldShowPasswordMismatch()">
+          {{ getFieldError('confirmPassword') }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Fitness Profile Section -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>fitness_center</mat-icon>
+        Your Fitness Profile
+      </h3>
+      
+      <p class="section-description">
+        Help us personalize your experience and set appropriate goals for your fitness journey.
+      </p>
+      
+      <!-- Fitness Level -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Current Fitness Level</mat-label>
+        <mat-select formControlName="fitnessLevel">
+          <mat-option *ngFor="let level of fitnessLevels" [value]="level">
+            {{ getFitnessLevelDisplay(level) }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matSuffix>trending_up</mat-icon>
+      </mat-form-field>
+
+      <!-- Primary Goal -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Primary Fitness Goal</mat-label>
+        <mat-select formControlName="primaryGoal">
+          <mat-option *ngFor="let goal of fitnessGoals" [value]="goal">
+            {{ getFitnessGoalDisplay(goal) }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matSuffix>flag</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <!-- Terms and Marketing Section -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <mat-icon>gavel</mat-icon>
+        Terms & Preferences
+      </h3>
+      
+      <!-- Terms Agreement -->
+      <div class="checkbox-field">
+        <mat-checkbox formControlName="agreeToTerms" class="terms-checkbox">
+          I agree to the 
+          <a href="/terms" target="_blank" class="link">Terms of Service</a> 
+          and 
+          <a href="/privacy" target="_blank" class="link">Privacy Policy</a>
+        </mat-checkbox>
+      </div>
+
+      <!-- Marketing Emails -->
+      <div class="checkbox-field">
+        <mat-checkbox formControlName="allowMarketing" class="marketing-checkbox">
+          Send me fitness tips, challenges, and product updates (optional)
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <!-- Error Display -->
+    <div class="error-container" *ngIf="error$ | async as error">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <span class="error-message">{{ error }}</span>
+    </div>
+
+    <!-- Submit Button -->
+    <button 
+      mat-raised-button 
+      color="primary" 
+      type="submit"
+      class="register-btn"
+      [disabled]="(isRegistering$ | async) || registerForm.invalid">
+      
+      <span *ngIf="!(isRegistering$ | async)">
+        <mat-icon>rocket_launch</mat-icon>
+        Start My Fitness Adventure
+      </span>
+      
+      <span *ngIf="isRegistering$ | async" class="loading-content">
+        <mat-spinner diameter="20" class="inline-spinner"></mat-spinner>
+        Creating your account...
+      </span>
+    </button>
+
+  </form>
+
+  <!-- Login Link -->
+  <div class="login-prompt">
+    <p class="login-text">
+      Already have an account? 
+      <button 
+        mat-button 
+        color="primary" 
+        class="login-link"
+        (click)="navigateToLogin()">
+        Sign in here
+      </button>
+    </p>
+    
+    <p class="benefits-text">
+      Join thousands of fitness enthusiasts who've discovered the joy of gamified wellness!
+    </p>
+  </div>
+
+</div>

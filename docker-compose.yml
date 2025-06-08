@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # SQL Server Database
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: fitnessvibe-db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=FitnessVibe123!
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - fitnessvibe-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P FitnessVibe123! -Q 'SELECT 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: fitnessvibe-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - fitnessvibe-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Backend API
+  api:
+    build:
+      context: ./src/backend
+      dockerfile: FitnessVibe.API/Dockerfile
+    container_name: fitnessvibe-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=database;Database=FitnessVibeDb;User=sa;Password=FitnessVibe123!;TrustServerCertificate=true;
+      - Redis__ConnectionString=redis:6379
+      - Jwt__Key=SuperSecretJwtKeyForDevelopmentThatIs32CharsLong!
+      - Jwt__Issuer=http://localhost:5001
+      - Jwt__Audience=http://localhost:4200
+    ports:
+      - "5001:80"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fitnessvibe-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Frontend Application
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+      args:
+        - API_URL=http://localhost:5001/api
+    container_name: fitnessvibe-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - fitnessvibe-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  sql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  fitnessvibe-network:
+    driver: bridge

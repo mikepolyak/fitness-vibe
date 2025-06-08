@@ -1,0 +1,82 @@
+<!-- Auth Layout Container - The premium fitness club lobby -->
+<div class="auth-layout">
+  
+  <!-- Background Hero Section -->
+  <div class="auth-hero">
+    <!-- Inspiring fitness background image -->
+    <div class="hero-background"></div>
+    <div class="hero-overlay"></div>
+    
+    <!-- Brand and Motivation Section -->
+    <div class="hero-content">
+      <div class="brand-section">
+        <div class="logo-container" (click)="navigateToHome()">
+          <img src="assets/images/logo-white.svg" alt="FitnessVibe" class="logo">
+          <span class="brand-name">FitnessVibe</span>
+        </div>
+        
+        <!-- Dynamic page title and description -->
+        <div class="page-header" *ngIf="pageData$ | async as pageData">
+          <h1 class="page-title">{{ pageData.title }}</h1>
+          <p class="page-description">{{ pageData.description }}</p>
+        </div>
+      </div>
+
+      <!-- Motivational Content -->
+      <div class="motivation-section">
+        <div class="feature-highlights">
+          <div class="feature-item">
+            <mat-icon class="feature-icon">sports_score</mat-icon>
+            <span>Gamified Progress</span>
+          </div>
+          <div class="feature-item">
+            <mat-icon class="feature-icon">groups</mat-icon>
+            <span>Social Community</span>
+          </div>
+          <div class="feature-item">
+            <mat-icon class="feature-icon">trending_up</mat-icon>
+            <span>Personal Growth</span>
+          </div>
+        </div>
+        
+        <blockquote class="inspiration-quote">
+          "Your fitness journey becomes an adventure when every workout is a quest, 
+          every goal is an achievement, and every friend is a teammate."
+        </blockquote>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Form Section -->
+  <div class="auth-form-section">
+    <div class="form-container">
+      
+      <!-- Loading indicator -->
+      <div class="loading-overlay" *ngIf="false"> <!-- Will connect to auth loading state -->
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Getting you ready for your fitness adventure...</p>
+      </div>
+
+      <!-- Auth content (login, register, etc.) -->
+      <div class="auth-content">
+        <router-outlet></router-outlet>
+      </div>
+
+      <!-- Footer Links -->
+      <div class="auth-footer">
+        <div class="footer-links">
+          <a routerLink="/privacy" class="footer-link">Privacy Policy</a>
+          <span class="separator">•</span>
+          <a routerLink="/terms" class="footer-link">Terms of Service</a>
+          <span class="separator">•</span>
+          <a routerLink="/support" class="footer-link">Support</a>
+        </div>
+        
+        <p class="footer-text">
+          Join thousands of fitness enthusiasts who've transformed their routines into adventures.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>

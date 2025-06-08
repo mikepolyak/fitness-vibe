@@ -1,0 +1,163 @@
+// Loading Spinner Styles
+// Think of these styles as the visual design for our activity indicators
+
+.loading-spinner {
+  display: flex;
+  position: relative;
+  
+  // Centered variant - like placing the indicator in the middle of equipment
+  &--centered {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100px;
+  }
+  
+  // Overlay variant - like covering the entire area with a "processing" screen
+  &--overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  // Size variants - like having different sized indicator lights
+  &--small {
+    .loading-spinner__content {
+      gap: 0.5rem;
+    }
+    
+    .loading-spinner__message {
+      font-size: 0.875rem;
+    }
+  }
+  
+  &--medium {
+    .loading-spinner__content {
+      gap: 1rem;
+    }
+    
+    .loading-spinner__message {
+      font-size: 1rem;
+    }
+  }
+  
+  &--large {
+    .loading-spinner__content {
+      gap: 1.5rem;
+    }
+    
+    .loading-spinner__message {
+      font-size: 1.125rem;
+      font-weight: 500;
+    }
+  }
+}
+
+// Overlay background - like a semi-transparent cover
+.loading-spinner__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(2px);
+  
+  // Dark mode support
+  @media (prefers-color-scheme: dark) {
+    background: rgba(0, 0, 0, 0.8);
+  }
+}
+
+// Spinner content container
+.loading-spinner__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+// Loading message text
+.loading-spinner__message {
+  color: var(--mdc-theme-on-surface, rgba(0, 0, 0, 0.87));
+  text-align: center;
+  font-family: var(--mdc-typography-body1-font-family);
+  line-height: 1.5;
+  margin: 0;
+  
+  // Animation for engaging user attention
+  animation: fadeInOut 2s ease-in-out infinite;
+  
+  // Dark mode support
+  @media (prefers-color-scheme: dark) {
+    color: var(--mdc-theme-on-surface, rgba(255, 255, 255, 0.87));
+  }
+}
+
+// Animations
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .loading-spinner {
+    &--large {
+      .loading-spinner__content {
+        gap: 1rem;
+      }
+      
+      .loading-spinner__message {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+// Accessibility improvements
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner__message {
+    animation: none;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .loading-spinner__overlay {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: none;
+  }
+  
+  .loading-spinner__message {
+    color: #000000;
+    font-weight: 600;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    .loading-spinner__overlay {
+      background: rgba(0, 0, 0, 0.95);
+    }
+    
+    .loading-spinner__message {
+      color: #ffffff;
+    }
+  }
+}
+
+// Focus and keyboard navigation support
+.loading-spinner:focus-visible {
+  outline: 2px solid var(--mdc-theme-primary);
+  outline-offset: 2px;
+}

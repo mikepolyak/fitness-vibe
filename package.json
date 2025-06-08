@@ -1,0 +1,126 @@
+{
+  "name": "fitness-vibe",
+  "version": "1.0.0",
+  "description": "An engaging fitness tracking application that gamifies your health journey",
+  "private": true,
+  "workspaces": [
+    "src/frontend"
+  ],
+  "scripts": {
+    "setup": "npm run setup:frontend && npm run setup:backend",
+    "setup:frontend": "cd src/frontend && npm install",
+    "setup:backend": "cd src/backend && dotnet restore",
+    
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:frontend": "cd src/frontend && npm start",
+    "start:backend": "cd src/backend && dotnet run --project FitnessVibe.API",
+    
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd src/frontend && npm run build:prod",
+    "build:backend": "cd src/backend && dotnet build -c Release",
+    
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "cd src/frontend && npm test -- --watch=false --browsers=ChromeHeadless",
+    "test:backend": "cd src/backend && dotnet test",
+    "test:coverage": "npm run test:frontend:coverage && npm run test:backend:coverage",
+    "test:frontend:coverage": "cd src/frontend && npm run test:coverage",
+    "test:backend:coverage": "cd src/backend && dotnet test --collect:\"XPlat Code Coverage\"",
+    
+    "lint": "npm run lint:frontend",
+    "lint:frontend": "cd src/frontend && npm run lint",
+    "lint:fix": "cd src/frontend && npm run lint:fix",
+    
+    "format": "npm run format:frontend",
+    "format:frontend": "cd src/frontend && npm run format",
+    
+    "clean": "npm run clean:frontend && npm run clean:backend",
+    "clean:frontend": "cd src/frontend && rm -rf node_modules dist .angular",
+    "clean:backend": "cd src/backend && dotnet clean && find . -name 'bin' -type d -exec rm -rf {} + && find . -name 'obj' -type d -exec rm -rf {} +",
+    
+    "migration:add": "cd src/backend && dotnet ef migrations add",
+    "migration:update": "cd src/backend && dotnet ef database update --project FitnessVibe.Infrastructure",
+    "migration:remove": "cd src/backend && dotnet ef migrations remove --project FitnessVibe.Infrastructure",
+    
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down",
+    "docker:clean": "docker-compose down --volumes --remove-orphans",
+    
+    "deploy:staging": "npm run build && npm run deploy:staging:frontend && npm run deploy:staging:backend",
+    "deploy:production": "npm run build && npm run deploy:production:frontend && npm run deploy:production:backend",
+    
+    "docs:serve": "cd docs && npm run serve",
+    "docs:build": "cd docs && npm run build",
+    
+    "health:check": "curl -f http://localhost:5001/health || exit 1",
+    "health:frontend": "curl -f http://localhost:4200 || exit 1",
+    
+    "analyze:frontend": "cd src/frontend && npm run analyze",
+    "analyze:backend": "cd src/backend && dotnet build --verbosity normal",
+    
+    "security:audit": "npm audit && cd src/frontend && npm audit",
+    "security:fix": "npm audit fix && cd src/frontend && npm audit fix",
+    
+    "pre-commit": "npm run lint && npm run test",
+    "pre-push": "npm run build && npm run test:coverage",
+    
+    "release": "standard-version",
+    "release:major": "standard-version --release-as major",
+    "release:minor": "standard-version --release-as minor",
+    "release:patch": "standard-version --release-as patch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fitness-vibe/fitness-vibe.git"
+  },
+  "keywords": [
+    "fitness",
+    "health",
+    "tracking",
+    "gamification",
+    "angular",
+    "dotnet",
+    "typescript",
+    "csharp",
+    "wellness",
+    "exercise"
+  ],
+  "author": "FitnessVibe Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fitness-vibe/fitness-vibe/issues"
+  },
+  "homepage": "https://fitnessvibe.com",
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "standard-version": "^9.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "lint-staged": {
+    "src/frontend/**/*.{js,ts,html}": [
+      "cd src/frontend && npm run lint:fix",
+      "cd src/frontend && npm run format"
+    ],
+    "**/*.{md,json,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "standard-version": {
+    "scripts": {
+      "prebump": "npm run test",
+      "postbump": "npm run build"
+    }
+  }
+}

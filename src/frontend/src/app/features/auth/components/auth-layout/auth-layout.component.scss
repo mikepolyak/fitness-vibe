@@ -1,0 +1,323 @@
+// Auth Layout Styles - Premium fitness club aesthetics
+// Color palette inspired by energy, motivation, and wellness
+
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.auth-layout {
+  display: flex;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+// Hero Section - Left side with inspiration and branding
+.auth-hero {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow: hidden;
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('assets/images/hero-fitness.jpg') center/cover;
+    filter: blur(1px);
+    transform: scale(1.05);
+  }
+
+  .hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(102, 126, 234, 0.9) 0%,
+      rgba(118, 75, 162, 0.8) 100%
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-align: center;
+    max-width: 500px;
+  }
+}
+
+// Brand Section
+.brand-section {
+  margin-bottom: 3rem;
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    .logo {
+      height: 48px;
+      width: auto;
+      margin-right: 12px;
+    }
+
+    .brand-name {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .page-header {
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0 0 1rem 0;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .page-description {
+      font-size: 1.125rem;
+      opacity: 0.9;
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+}
+
+// Motivation Section
+.motivation-section {
+  .feature-highlights {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+
+    .feature-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+      }
+
+      .feature-icon {
+        font-size: 2rem;
+        width: 2rem;
+        height: 2rem;
+      }
+
+      span {
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-align: center;
+      }
+    }
+  }
+
+  .inspiration-quote {
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border-left: 4px solid rgba(255, 255, 255, 0.3);
+  }
+}
+
+// Form Section - Right side with authentication forms
+.auth-form-section {
+  flex: 0 0 480px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.form-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+
+  p {
+    margin-top: 1rem;
+    color: #666;
+    font-size: 0.875rem;
+  }
+}
+
+.auth-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+
+// Footer
+.auth-footer {
+  margin-top: auto;
+  padding-top: 2rem;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+
+  .footer-links {
+    margin-bottom: 1rem;
+
+    .footer-link {
+      color: #666;
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: #667eea;
+      }
+    }
+
+    .separator {
+      margin: 0 0.75rem;
+      color: #ccc;
+    }
+  }
+
+  .footer-text {
+    font-size: 0.75rem;
+    color: #999;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .auth-layout {
+    flex-direction: column;
+  }
+
+  .auth-hero {
+    flex: 0 0 40%;
+    padding: 1.5rem;
+
+    .hero-content {
+      max-width: 100%;
+    }
+
+    .motivation-section .feature-highlights {
+      gap: 1rem;
+
+      .feature-item {
+        padding: 0.75rem;
+      }
+    }
+  }
+
+  .auth-form-section {
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-hero {
+    .brand-section .page-header .page-title {
+      font-size: 2rem;
+    }
+
+    .motivation-section .feature-highlights {
+      flex-direction: column;
+      gap: 0.75rem;
+
+      .feature-item {
+        flex-direction: row;
+        padding: 0.75rem 1rem;
+      }
+    }
+  }
+
+  .form-container {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-hero {
+    padding: 1rem;
+
+    .brand-section {
+      margin-bottom: 2rem;
+
+      .logo-container .brand-name {
+        font-size: 1.5rem;
+      }
+
+      .page-header .page-title {
+        font-size: 1.75rem;
+      }
+    }
+  }
+
+  .form-container {
+    padding: 1rem;
+  }
+}
+
+// Animation for smooth page transitions
+.auth-content {
+  animation: slideInFromRight 0.6s ease-out;
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

@@ -1,0 +1,384 @@
+// User Avatar Component Styles
+// Think of these as the styling rules for profile pictures and member photos
+
+.user-avatar {
+  position: relative;
+  display: inline-block;
+  
+  // Clickable state styling
+  &--clickable {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+    
+    &:focus-visible {
+      outline: 2px solid var(--primary-color, #3b82f6);
+      outline-offset: 2px;
+    }
+  }
+  
+  // Size variants - like different photo frame sizes
+  &--xs {
+    .user-avatar__image-container {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .user-avatar__initials {
+      font-size: 10px;
+      font-weight: 600;
+    }
+    
+    .user-avatar__level-badge {
+      width: 12px;
+      height: 12px;
+      font-size: 8px;
+      bottom: -2px;
+      right: -2px;
+    }
+    
+    .user-avatar__status-indicator {
+      width: 6px;
+      height: 6px;
+      bottom: 0;
+      right: 0;
+    }
+  }
+  
+  &--sm {
+    .user-avatar__image-container {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .user-avatar__initials {
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .user-avatar__level-badge {
+      width: 16px;
+      height: 16px;
+      font-size: 10px;
+      bottom: -2px;
+      right: -2px;
+    }
+    
+    .user-avatar__status-indicator {
+      width: 8px;
+      height: 8px;
+      bottom: 0;
+      right: 0;
+    }
+  }
+  
+  &--md {
+    .user-avatar__image-container {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .user-avatar__initials {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .user-avatar__level-badge {
+      width: 20px;
+      height: 20px;
+      font-size: 11px;
+      bottom: -3px;
+      right: -3px;
+    }
+    
+    .user-avatar__status-indicator {
+      width: 10px;
+      height: 10px;
+      bottom: 2px;
+      right: 2px;
+    }
+  }
+  
+  &--lg {
+    .user-avatar__image-container {
+      width: 56px;
+      height: 56px;
+    }
+    
+    .user-avatar__initials {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .user-avatar__level-badge {
+      width: 24px;
+      height: 24px;
+      font-size: 12px;
+      bottom: -3px;
+      right: -3px;
+    }
+    
+    .user-avatar__status-indicator {
+      width: 12px;
+      height: 12px;
+      bottom: 3px;
+      right: 3px;
+    }
+  }
+  
+  &--xl {
+    .user-avatar__image-container {
+      width: 80px;
+      height: 80px;
+    }
+    
+    .user-avatar__initials {
+      font-size: 28px;
+      font-weight: 600;
+    }
+    
+    .user-avatar__level-badge {
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+      bottom: -4px;
+      right: -4px;
+    }
+    
+    .user-avatar__status-indicator {
+      width: 16px;
+      height: 16px;
+      bottom: 4px;
+      right: 4px;
+    }
+  }
+}
+
+// Main image container
+.user-avatar__image-container {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--surface-color, #ffffff);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+// Avatar image
+.user-avatar__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  background: var(--surface-color, #ffffff);
+}
+
+// Initials fallback
+.user-avatar__initials {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  user-select: none;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+// Level badge overlay
+.user-avatar__level-badge {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  width: 20px;
+  height: 20px;
+  background: var(--primary-color, #3b82f6);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  border: 2px solid var(--surface-color, #ffffff);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+// Online status indicator
+.user-avatar__status-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--surface-color, #ffffff);
+  z-index: 2;
+  
+  &--online {
+    background: #10b981; // Green for online
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+  }
+  
+  &--offline {
+    background: #6b7280; // Gray for offline
+  }
+}
+
+// Progress ring for level progression
+.user-avatar__progress-ring {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  transform: rotate(-90deg);
+  z-index: 1;
+}
+
+.user-avatar__progress-ring-bg,
+.user-avatar__progress-ring-progress {
+  stroke-width: 2;
+  fill: none;
+}
+
+.user-avatar__progress-ring-progress {
+  transition: stroke-dasharray 0.5s ease;
+  stroke-linecap: round;
+}
+
+// Tooltip content (hidden by default, shown by Material tooltip)
+.user-avatar__tooltip-content {
+  text-align: center;
+}
+
+.user-avatar__tooltip-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.user-avatar__tooltip-level {
+  font-size: 12px;
+  color: var(--text-secondary-color, #6b7280);
+  margin-top: 2px;
+}
+
+.user-avatar__tooltip-fitness {
+  font-size: 11px;
+  color: var(--text-secondary-color, #6b7280);
+  margin-top: 1px;
+}
+
+// Animations
+@keyframes levelUp {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// Level up animation class (can be triggered programmatically)
+.user-avatar--level-up {
+  .user-avatar__level-badge {
+    animation: levelUp 0.6s ease-in-out;
+  }
+}
+
+// Loading state
+.user-avatar--loading {
+  .user-avatar__image-container {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .user-avatar__image-container {
+    border-color: var(--surface-dark-color, #374151);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .user-avatar__level-badge {
+    border-color: var(--surface-dark-color, #374151);
+  }
+  
+  .user-avatar__status-indicator {
+    border-color: var(--surface-dark-color, #374151);
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .user-avatar__image-container {
+    border-width: 3px;
+    border-color: currentColor;
+  }
+  
+  .user-avatar__level-badge {
+    border-width: 3px;
+    font-weight: 900;
+  }
+}
+
+// Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .user-avatar--clickable {
+    transition: none;
+    
+    &:hover {
+      transform: none;
+    }
+  }
+  
+  .user-avatar__progress-ring-progress {
+    transition: none;
+  }
+  
+  .user-avatar--loading .user-avatar__image-container {
+    animation: none;
+    background: #e0e0e0;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .user-avatar {
+    // Slightly larger tap targets on mobile
+    &--clickable {
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
