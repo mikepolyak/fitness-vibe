@@ -1,5 +1,10 @@
-using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace FitnessVibe.Application.Behaviors
@@ -15,14 +20,20 @@ namespace FitnessVibe.Application.Behaviors
         private readonly IEnumerable<IValidator<TRequest>> _validators;
         private readonly ILogger<ValidationBehavior<TRequest, TResponse>> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the behavior
+        /// </summary>
         public ValidationBehavior(
             IEnumerable<IValidator<TRequest>> validators,
             ILogger<ValidationBehavior<TRequest, TResponse>> logger)
         {
-            _validators = validators;
-            _logger = logger;
+            _validators = validators ?? throw new ArgumentNullException(nameof(validators));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>
+        /// Handles the request by validating it first
+        /// </summary>
         public async Task<TResponse> Handle(
             TRequest request, 
             RequestHandlerDelegate<TResponse> next, 
@@ -39,14 +50,17 @@ namespace FitnessVibe.Application.Behaviors
                 _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
 
             var failures = validationResults
+                .Where(r => r.Errors.Any())
                 .SelectMany(r => r.Errors)
-                .Where(f => f != null)
                 .ToList();
 
             if (failures.Any())
             {
-                _logger.LogWarning("Validation failed for {RequestType}. Errors: {Errors}",
-                    typeof(TRequest).Name,
+                var requestTypeName = typeof(TRequest).Name;
+                
+                _logger.LogWarning(
+                    "Validation failed for {RequestType}. Errors: {Errors}",
+                    requestTypeName,
                     string.Join("; ", failures.Select(f => f.ErrorMessage)));
 
                 throw new ValidationException(failures);

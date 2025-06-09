@@ -189,5 +189,90 @@ namespace FitnessVibe.Domain.Events
                 UserActivity = userActivity ?? throw new ArgumentNullException(nameof(userActivity));
             }
         }
+
+    /// <summary>
+    /// Event raised when a new activity is created
+    /// </summary>
+    /// <param name="ActivityId">ID of the activity</param>
+    /// <param name="UserId">ID of the user who created the activity</param>
+    public record ActivityCreatedEvent(Guid ActivityId, Guid UserId) : IDomainEvent
+    {
+        /// <inheritdoc/>
+        public Guid Id { get; } = Guid.NewGuid();
+
+        /// <inheritdoc/>
+        public DateTime OccurredOn { get; } = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Event raised when an activity is started
+    /// </summary>
+    /// <param name="ActivityId">ID of the activity</param>
+    /// <param name="UserId">ID of the user who started the activity</param>
+    public record ActivityStartedEvent(Guid ActivityId, Guid UserId) : IDomainEvent
+    {
+        /// <inheritdoc/>
+        public Guid Id { get; } = Guid.NewGuid();
+
+        /// <inheritdoc/>
+        public DateTime OccurredOn { get; } = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Event raised when an activity is paused
+    /// </summary>
+    /// <param name="ActivityId">ID of the activity</param>
+    /// <param name="UserId">ID of the user who paused the activity</param>
+    public record ActivityPausedEvent(Guid ActivityId, Guid UserId) : IDomainEvent
+    {
+        /// <inheritdoc/>
+        public Guid Id { get; } = Guid.NewGuid();
+
+        /// <inheritdoc/>
+        public DateTime OccurredOn { get; } = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Event raised when a paused activity is resumed
+    /// </summary>
+    /// <param name="ActivityId">ID of the activity</param>
+    /// <param name="UserId">ID of the user who resumed the activity</param>
+    public record ActivityResumedEvent(Guid ActivityId, Guid UserId) : IDomainEvent
+    {
+        /// <inheritdoc/>
+        public Guid Id { get; } = Guid.NewGuid();
+
+        /// <inheritdoc/>
+        public DateTime OccurredOn { get; } = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Event raised when an activity is completed
+    /// </summary>
+    /// <param name="ActivityId">ID of the activity</param>
+    /// <param name="UserId">ID of the user who completed the activity</param>
+    public record ActivityCompletedEvent(Guid ActivityId, Guid UserId) : IDomainEvent
+    {
+        /// <inheritdoc/>
+        public Guid Id { get; } = Guid.NewGuid();
+
+        /// <inheritdoc/>
+        public DateTime OccurredOn { get; } = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Event raised when an activity is cancelled
+    /// </summary>
+    /// <param name="ActivityId">ID of the activity</param>
+    /// <param name="UserId">ID of the user who cancelled the activity</param>
+    /// <param name="Reason">Reason for cancellation</param>
+    public record ActivityCancelledEvent(Guid ActivityId, Guid UserId, string Reason) : IDomainEvent
+    {
+        /// <inheritdoc/>
+        public Guid Id { get; } = Guid.NewGuid();
+
+        /// <inheritdoc/>
+        public DateTime OccurredOn { get; } = DateTime.UtcNow;
+    }
     }
 }
