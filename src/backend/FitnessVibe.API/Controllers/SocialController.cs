@@ -1,5 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetC                var command = new GetSocialFeedQuery
+                {
+                    UserId = userId,
+                    FeedType = feedType,
+                    Page = page,
+                    PageSize = Math.Min(pageSize, 50), // Cap at 50 posts per page
+                    ActivityTypeFilter = activityTypeFilter,
+                    IncludeLiveActivities = includeLiveActivities
+                };rization;
 using MediatR;
 using FitnessVibe.Application.Commands.Social;
 using FitnessVibe.Application.Queries.Social;
@@ -148,7 +156,7 @@ namespace FitnessVibe.API.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
         public async Task<ActionResult<SendFriendRequestResponse>> SendFriendRequest(
-            int targetUserId, 
+            Guid targetUserId, 
             [FromBody] SendFriendRequestCommand command)
         {
             try
@@ -204,7 +212,7 @@ namespace FitnessVibe.API.Controllers
         [ProducesResponseType(typeof(RespondToFriendRequestResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RespondToFriendRequestResponse>> RespondToFriendRequest(
-            int requestId, 
+            Guid requestId, 
             [FromBody] RespondToFriendRequestCommand command)
         {
             try
@@ -255,7 +263,7 @@ namespace FitnessVibe.API.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<SendCheerResponse>> SendCheer(
-            int targetUserId, 
+            Guid targetUserId, 
             [FromBody] SendCheerCommand command)
         {
             try
@@ -310,7 +318,7 @@ namespace FitnessVibe.API.Controllers
         [ProducesResponseType(typeof(ShareActivityResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ShareActivityResponse>> ShareActivity(
-            int activityId, 
+            Guid activityId, 
             [FromBody] ShareActivityCommand command)
         {
             try
@@ -358,7 +366,7 @@ namespace FitnessVibe.API.Controllers
         [HttpPost("posts/{postId}/like")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> LikePost(int postId)
+        public async Task<ActionResult> LikePost(Guid postId)
         {
             try
             {
@@ -410,7 +418,7 @@ namespace FitnessVibe.API.Controllers
         [HttpPost("posts/{postId}/comment")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> CommentOnPost(int postId, [FromBody] CommentOnPostRequest request)
+        public async Task<ActionResult> CommentOnPost(Guid postId, [FromBody] CommentOnPostRequest request)
         {
             try
             {
@@ -459,10 +467,10 @@ namespace FitnessVibe.API.Controllers
         /// Get current user ID from JWT claims.
         /// Like reading your member ID from your gym access card.
         /// </summary>
-        private int GetCurrentUserId()
+        private Guid GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
             {
                 throw new UnauthorizedAccessException("Invalid user ID in token");
             }
@@ -472,30 +480,70 @@ namespace FitnessVibe.API.Controllers
 
     // Request/Response DTOs for social features
 
+    /// <summary>
+    /// Request model for commenting on a post
+    /// </summary>
     public class CommentOnPostRequest
     {
+        /// <summary>
+        /// The comment text
+        /// </summary>
         public string Content { get; set; } = string.Empty;
     }
 
     // Placeholder command classes for social features
     // These would be implemented similarly to the existing commands
 
+    /// <summary>
+    /// Command for liking a post
+    /// </summary>
     public class LikePostCommand : IRequest
     {
-        public int UserId { get; set; }
-        public int PostId { get; set; }
+        /// <summary>
+        /// The ID of the user liking the post
+        /// </summary>
+        public Guid UserId { get; set; }
+
+        /// <summary>
+        /// The ID of the post being liked
+        /// </summary>
+        public Guid PostId { get; set; }
     }
 
+    /// <summary>
+    /// Command for commenting on a post
+    /// </summary>
     public class CommentOnPostCommand : IRequest<CommentOnPostResponse>
     {
-        public int UserId { get; set; }
-        public int PostId { get; set; }
+        /// <summary>
+        /// The ID of the user commenting
+        /// </summary>
+        public Guid UserId { get; set; }
+
+        /// <summary>
+        /// The ID of the post being commented on
+        /// </summary>
+        public Guid PostId { get; set; }
+
+        /// <summary>
+        /// The comment text
+        /// </summary>
         public string Content { get; set; } = string.Empty;
     }
 
+    /// <summary>
+    /// Response model for post comments
+    /// </summary>
     public class CommentOnPostResponse
     {
-        public int CommentId { get; set; }
+        /// <summary>
+        /// The ID of the created comment
+        /// </summary>
+        public Guid CommentId { get; set; }
+
+        /// <summary>
+        /// When the comment was created
+        /// </summary>
         public DateTime CreatedAt { get; set; }
     }
 }

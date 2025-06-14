@@ -9,8 +9,8 @@ namespace FitnessVibe.Application.Commands.Activities
     /// </summary>
     public class CompleteActivityCommand : IRequest<CompleteActivityResponse>
     {
-        public int UserId { get; set; }
-        public int SessionId { get; set; }
+        public Guid UserId { get; set; }
+        public Guid SessionId { get; set; }
         public DateTime? EndTime { get; set; } // Optional - defaults to now
         public double? EndLatitude { get; set; }
         public double? EndLongitude { get; set; }
@@ -32,7 +32,7 @@ namespace FitnessVibe.Application.Commands.Activities
     /// </summary>
     public class CompleteActivityResponse
     {
-        public int ActivityId { get; set; }
+        public Guid ActivityId { get; set; }
         public string ActivityName { get; set; } = string.Empty;
         public WorkoutStatsResponse Stats { get; set; } = new();
         public RewardsEarnedResponse Rewards { get; set; } = new();

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using FitnessVibe.Domain.Entities.Users;
 using FitnessVibe.Domain.Entities.Activities;
 using FitnessVibe.Domain.Entities.Gamification;
+using FitnessVibe.Domain.Entities.Challenges;
 using FitnessVibe.Domain.Common;
 using FitnessVibe.Domain.Enums;
 using System.Reflection;
@@ -63,6 +64,16 @@ namespace FitnessVibe.Infrastructure.Data
         /// Gets or sets the available badges
         /// </summary>
         public DbSet<Badge> Badges { get; set; } = null!;
+
+        /// <summary>
+        /// Gets or sets the challenges in the system
+        /// </summary>
+        public DbSet<Challenge> Challenges { get; set; } = null!;
+
+        /// <summary>
+        /// Gets or sets the challenge participants
+        /// </summary>
+        public DbSet<ChallengeParticipant> ChallengeParticipants { get; set; } = null!;
 
         /// <summary>
         /// Configures the model for this context

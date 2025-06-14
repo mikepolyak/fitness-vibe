@@ -4,6 +4,7 @@ using FitnessVibe.Domain.Common;
 using FitnessVibe.Domain.Entities.Users;
 using FitnessVibe.Domain.Enums;
 using FitnessVibe.Domain.Events;
+using FitnessVibe.Domain.ValueObjects;
 
 namespace FitnessVibe.Domain.Entities.Activities
 {
@@ -83,6 +84,11 @@ namespace FitnessVibe.Domain.Entities.Activities
         /// List of pause periods during this activity
         /// </summary>
         private readonly List<(DateTime Start, DateTime? End)> _pausePeriods = new();
+
+        /// <summary>
+        /// The route data for this activity
+        /// </summary>
+        public ActivityRoute? Route { get; private set; }
 
         /// <summary>
         /// Total duration excluding pauses, in minutes
@@ -249,6 +255,48 @@ namespace FitnessVibe.Domain.Entities.Activities
         }
 
         /// <summary>
+        /// Starts route tracking for this activity
+        /// </summary>
+        public void StartRouteTracking()
+        {
+            if (Status != ActivityStatus.Active)
+                throw new InvalidOperationException("Cannot start route tracking when activity is not active");
+
+            if (Route == null)
+                Route = new ActivityRoute(this);
+        }
+
+        /// <summary>
+        /// Adds a GPS point to the activity route
+        /// </summary>
+        public void AddRoutePoint(double latitude, double longitude, double? elevation = null, double? speed = null, double? accuracy = null)
+        {
+            if (Route == null)
+                throw new InvalidOperationException("Route tracking has not been started");
+
+            if (Status != ActivityStatus.Active)
+                throw new InvalidOperationException("Cannot add route points when activity is not active");
+
+            var point = new GpsPoint(latitude, longitude, elevation, DateTime.UtcNow, speed, accuracy);
+            Route.AddPoint(point);
+        }
+
+        /// <summary>
+        /// Gets total distance covered in meters
+        /// </summary>
+        public double? GetTotalDistance() => Route?.TotalDistance;
+
+        /// <summary>
+        /// Gets average speed in meters per second
+        /// </summary>
+        public double? GetAverageSpeed() => Route?.AverageSpeed;
+
+        /// <summary>
+        /// Gets total elevation gain in meters
+        /// </summary>
+        public double? GetElevationGain() => Route?.ElevationGain;
+
+        /// <summary>
         /// Creates a new activity
         /// </summary>
         /// <param name="name">Name of the activity</param>
@@ -286,10 +334,6 @@ namespace FitnessVibe.Domain.Entities.Activities
             activity.AddDomainEvent(new ActivityCreatedEvent(activity.Id, userId));
             return activity;
         }
-    }
-
-    internal class ActivityStartedEvent : IDomainEvent
-    {
     }
 
 }

@@ -8,8 +8,8 @@ namespace FitnessVibe.Application.Commands.Social
     /// </summary>
     public class SendFriendRequestCommand : IRequest<SendFriendRequestResponse>
     {
-        public int UserId { get; set; } // Sender
-        public int TargetUserId { get; set; } // Receiver
+        public Guid UserId { get; set; } // Sender
+        public Guid TargetUserId { get; set; } // Receiver
         public string? Message { get; set; } // Optional personal message
         public string Source { get; set; } = "Manual"; // Manual, Activity, Club, etc.
     }

@@ -1,4 +1,5 @@
 using MediatR;
+using FitnessVibe.Application.DTOs.Activities;
 
 namespace FitnessVibe.Application.Queries.Activities
 {
@@ -6,9 +7,9 @@ namespace FitnessVibe.Application.Queries.Activities
     /// Query to get user's activity history and workout timeline.
     /// Like browsing through your personal fitness journal to see all your progress.
     /// </summary>
-    public class GetUserActivitiesQuery : IRequest<UserActivitiesResponse>
+    public class GetUserActivitiesQuery : IRequest<IEnumerable<UserActivityResponse>>
     {
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public string? ActivityType { get; set; }

@@ -1,4 +1,5 @@
 using MediatR;
+using FitnessVibe.Application.DTOs.Activities;
 
 namespace FitnessVibe.Application.Queries.Activities
 {
@@ -9,45 +10,13 @@ namespace FitnessVibe.Application.Queries.Activities
     /// </summary>
     public class GetLiveActivityQuery : IRequest<LiveActivityResponse>
     {
-        public int UserId { get; set; }
-        public int? SessionId { get; set; } // Optional - get current active session if not provided
+        public Guid UserId { get; set; }
+        public Guid SessionId { get; set; }
         public bool IncludeRealTimeMetrics { get; set; } = true;
         public bool IncludeFriendsWatching { get; set; } = true;
         public bool IncludeCheers { get; set; } = true;
     }
-
-    /// <summary>
-    /// Real-time activity information with live metrics and social features.
-    /// Like your workout dashboard showing everything happening right now.
-    /// </summary>
-    public class LiveActivityResponse
-    {
-        public ActiveSessionDto Session { get; set; } = new();
-        public LiveMetricsDto CurrentMetrics { get; set; } = new();
-        public List<LiveCheerDto> RecentCheers { get; set; } = new();
-        public List<FriendWatchingDto> FriendsWatching { get; set; } = new();
-        public WorkoutProgressDto Progress { get; set; } = new();
-        public List<MilestoneDto> UpcomingMilestones { get; set; } = new();
-        public SafetyStatusDto SafetyStatus { get; set; } = new();
-        public string LiveSessionUrl { get; set; } = string.Empty;
-    }
-
-    /// <summary>
-    /// Information about the current active workout session.
-    /// Like the main display on your fitness tracker showing session details.
-    /// </summary>
-    public class ActiveSessionDto
-    {
-        public int SessionId { get; set; }
-        public string ActivityName { get; set; } = string.Empty;
-        public string ActivityType { get; set; } = string.Empty;
-        public DateTime StartTime { get; set; }
-        public TimeSpan ElapsedTime { get; set; }
-        public string Status { get; set; } = string.Empty; // Active, Paused, AutoPaused
-        public bool IsGpsEnabled { get; set; }
-        public bool IsPublic { get; set; }
-        public bool CanReceiveCheers { get; set; }
-        public TimeSpan? PlannedDuration { get; set; }
+}
         public double? TargetDistance { get; set; }
         public int? TargetCalories { get; set; }
         public List<string> Tags { get; set; } = new();

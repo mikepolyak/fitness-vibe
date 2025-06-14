@@ -1,4 +1,5 @@
 using MediatR;
+using FitnessVibe.Application.Common;
 
 namespace FitnessVibe.Application.Commands.Activities
 {
@@ -8,19 +9,66 @@ namespace FitnessVibe.Application.Commands.Activities
     /// to doing. Whether it's a morning run, gym session, or yoga practice, this command
     /// captures that powerful moment of beginning.
     /// </summary>
-    public class StartActivityCommand : IRequest<StartActivityResponse>
+    public class StartActivityCommand : IRequest<StartActivityResponse>, IUserOwnedEntity
     {
-        public int UserId { get; set; }
-        public string ActivityType { get; set; } = string.Empty; // Running, Cycling, Swimming, Gym, Yoga, etc.
-        public string? ActivityName { get; set; } // Custom name for this session
+        /// <summary>
+        /// User ID of the activity owner.
+        /// </summary>
+        public Guid UserId { get; set; }
+
+        /// <summary>
+        /// Type of activity (Running, Cycling, Swimming, Gym, Yoga, etc.)
+        /// </summary>
+        public string ActivityType { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Custom name for this session
+        /// </summary>
+        public string? ActivityName { get; set; }
+
+        /// <summary>
+        /// Starting latitude if GPS tracking is enabled
+        /// </summary>
         public double? StartLatitude { get; set; }
+
+        /// <summary>
+        /// Starting longitude if GPS tracking is enabled
+        /// </summary>
         public double? StartLongitude { get; set; }
+
+        /// <summary>
+        /// Starting altitude in meters if GPS tracking is enabled
+        /// </summary>
         public double? StartAltitude { get; set; }
+
+        /// <summary>
+        /// When the session is planned to start
+        /// </summary>
         public DateTime? PlannedStartTime { get; set; }
+
+        /// <summary>
+        /// Planned duration of the session
+        /// </summary>
         public TimeSpan? PlannedDuration { get; set; }
+
+        /// <summary>
+        /// Optional notes about the session
+        /// </summary>
         public string? Notes { get; set; }
+
+        /// <summary>
+        /// Additional metadata key-value pairs
+        /// </summary>
         public Dictionary<string, object> Metadata { get; set; } = new();
-        public bool IsPublic { get; set; } = true; // Whether friends can see this live session
+
+        /// <summary>
+        /// Whether friends can see this live session
+        /// </summary>
+        public bool IsPublic { get; set; } = true;
+
+        /// <summary>
+        /// Tags to categorize/identify the activity
+        /// </summary>
         public List<string> Tags { get; set; } = new();
     }
 
@@ -30,16 +78,59 @@ namespace FitnessVibe.Application.Commands.Activities
     /// </summary>
     public class StartActivityResponse
     {
-        public int SessionId { get; set; }
+        /// <summary>
+        /// ID of the new activity session
+        /// </summary>
+        public Guid SessionId { get; set; }
+
+        /// <summary>
+        /// Type of activity (e.g., Running, Cycling)
+        /// </summary>
         public string ActivityType { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Custom name for the session
+        /// </summary>
         public string ActivityName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// When the session started
+        /// </summary>
         public DateTime StartTime { get; set; }
-        public string Status { get; set; } = string.Empty; // Active, Paused, etc.
+
+        /// <summary>
+        /// Current status (Active, Paused, etc.)
+        /// </summary>
+        public string Status { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Whether GPS tracking is enabled
+        /// </summary>
         public bool IsGpsEnabled { get; set; }
+
+        /// <summary>
+        /// Whether friends can send cheers
+        /// </summary>
         public bool CanReceiveCheers { get; set; }
+
+        /// <summary>
+        /// Link to watch live session
+        /// </summary>
         public string LiveSessionUrl { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Expected workout statistics
+        /// </summary>
         public EstimatedStatsResponse EstimatedStats { get; set; } = new();
+
+        /// <summary>
+        /// Personalized message to boost motivation
+        /// </summary>
         public string MotivationalMessage { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Suggested targets for this session
+        /// </summary>
         public List<string> RecommendedTargets { get; set; } = new();
     }
 
