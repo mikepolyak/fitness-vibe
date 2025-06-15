@@ -20,7 +20,7 @@ namespace FitnessVibe.Application.Commands.Social
     /// </summary>
     public class SendFriendRequestResponse
     {
-        public int FriendRequestId { get; set; }
+        public Guid FriendRequestId { get; set; }
         public string TargetUserName { get; set; } = string.Empty;
         public string TargetUserAvatarUrl { get; set; } = string.Empty;
         public DateTime SentAt { get; set; }
@@ -34,8 +34,8 @@ namespace FitnessVibe.Application.Commands.Social
     /// </summary>
     public class RespondToFriendRequestCommand : IRequest<RespondToFriendRequestResponse>
     {
-        public int UserId { get; set; } // Responder
-        public int FriendRequestId { get; set; }
+        public Guid UserId { get; set; } // Responder
+        public Guid FriendRequestId { get; set; }
         public string Response { get; set; } = string.Empty; // Accept, Decline
         public string? ResponseMessage { get; set; } // Optional message
     }
@@ -51,7 +51,7 @@ namespace FitnessVibe.Application.Commands.Social
         public DateTime RespondedAt { get; set; }
         public string Message { get; set; } = string.Empty;
         public bool BothUsersNowFriends { get; set; }
-        public int? NewFriendshipId { get; set; }
+        public Guid? NewFriendshipId { get; set; }
     }
 
     /// <summary>
@@ -60,9 +60,9 @@ namespace FitnessVibe.Application.Commands.Social
     /// </summary>
     public class SendCheerCommand : IRequest<SendCheerResponse>
     {
-        public int UserId { get; set; } // Sender
-        public int TargetUserId { get; set; } // Receiver
-        public int? ActivityId { get; set; } // Live activity being cheered
+        public Guid UserId { get; set; } // Sender
+        public Guid TargetUserId { get; set; } // Receiver
+        public Guid? ActivityId { get; set; } // Live activity being cheered
         public string CheerType { get; set; } = "Text"; // Text, Audio, Emoji, PowerUp
         public string Message { get; set; } = string.Empty;
         public string? AudioUrl { get; set; } // For audio cheers
@@ -75,7 +75,7 @@ namespace FitnessVibe.Application.Commands.Social
     /// </summary>
     public class SendCheerResponse
     {
-        public int CheerId { get; set; }
+        public Guid CheerId { get; set; }
         public string TargetUserName { get; set; } = string.Empty;
         public bool IsLiveActivity { get; set; }
         public bool CheerDelivered { get; set; }
@@ -90,13 +90,13 @@ namespace FitnessVibe.Application.Commands.Social
     /// </summary>
     public class ShareActivityCommand : IRequest<ShareActivityResponse>
     {
-        public int UserId { get; set; }
-        public int ActivityId { get; set; }
+        public Guid UserId { get; set; }
+        public Guid ActivityId { get; set; }
         public string? Caption { get; set; }
         public List<string> TaggedFriends { get; set; } = new();
         public List<string> HashTags { get; set; } = new();
         public bool ShareToClubs { get; set; } = false;
-        public List<int> ClubIds { get; set; } = new();
+        public List<Guid> ClubIds { get; set; } = new();
         public string Privacy { get; set; } = "Friends"; // Public, Friends, Private
     }
 
@@ -105,7 +105,7 @@ namespace FitnessVibe.Application.Commands.Social
     /// </summary>
     public class ShareActivityResponse
     {
-        public int PostId { get; set; }
+        public Guid PostId { get; set; }
         public string ShareableUrl { get; set; } = string.Empty;
         public string GeneratedCaption { get; set; } = string.Empty;
         public List<string> SuggestedHashtags { get; set; } = new();
